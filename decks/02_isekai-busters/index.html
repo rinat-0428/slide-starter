@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>異世界バスターズ — 企画書</title>
+  <link rel="stylesheet" href="../../engine/slide.css">
+  <link rel="stylesheet" href="../../theme/horror.css">
+  <style>
+    /* P3: すべての登場人物行を太字 */
+    .char-table tbody td { font-weight: 700; color: var(--color-fg); }
+
+    /* P4: YouTube市場事例カード */
+    .yt-mkt { display:flex; flex-direction:column; background:rgba(13,12,16,0.85); border:1px solid rgba(185,28,28,0.3); border-radius:6px; overflow:hidden; text-decoration:none; color:inherit; transition:border-color .2s; }
+    .yt-mkt:hover { border-color:rgba(185,28,28,0.75); }
+    .yt-mkt-thumb { position:relative; width:100%; padding-top:34%; background:#07060c; flex-shrink:0; }
+    .yt-mkt-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .yt-mkt-thumb .css-bg { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.35rem; }
+    .yt-mkt-thumb .yt-play { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:36px; height:36px; background:rgba(185,28,28,0.85); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.9rem; color:#fff; pointer-events:none; }
+    .yt-mkt-body { padding:.45rem .7rem .5rem; }
+    .yt-mkt-body .mc-num { font-size:.65rem; color:var(--color-accent); letter-spacing:.08em; display:block; margin-bottom:.15rem; text-transform:uppercase; }
+    .yt-mkt-body h3 { font-size:.82rem; font-weight:700; color:var(--color-fg); margin-bottom:.2rem; line-height:1.3; }
+    .yt-mkt-body p { font-size:.7rem; color:rgba(236,232,228,0.5); line-height:1.38; margin-bottom:.2rem; }
+    .yt-mkt-body .mc-stat { font-size:.68rem; color:#f87171; display:block; font-weight:600; }
+
+    /* P7: 都市伝説キャラクター紹介カード */
+    .char-card { display:flex; flex-direction:column; background:rgba(10,8,14,0.85); border:1px solid rgba(185,28,28,0.22); border-radius:6px; overflow:hidden; }
+    .cc-img { width:100%; height:120px; object-fit:cover; object-position:top center; display:block; }
+    .cc-img-bg { width:100%; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.2rem; flex-shrink:0; }
+    .cc-body { padding:.45rem .6rem; display:flex; flex-direction:column; gap:.22rem; flex:1; }
+    .cc-name { font-size:.92rem; font-weight:800; color:var(--color-fg); line-height:1.2; }
+    .cc-yomi { font-size:.62rem; color:var(--color-accent); letter-spacing:.1em; font-family:monospace; opacity:.8; }
+    .cc-desc { font-size:.68rem; color:rgba(236,232,228,0.48); line-height:1.45; }
+    .cc-role { font-size:.68rem; color:#fca5a5; line-height:1.4; border-left:2px solid rgba(185,28,28,0.5); padding-left:.4rem; margin-top:.1rem; }
+
+    /* P7: キャラクターカード コンパクト化 */
+    .char-grid .char-card { gap: .12rem; }
+    .char-grid .cc-img    { height: 105px; }
+    .char-grid .cc-img-bg { height: 105px; gap: .1rem; }
+    .char-grid .cc-img-bg span:first-child { font-size: 2.4rem !important; }
+    .char-grid .cc-body   { padding: .25rem .4rem; gap: .12rem; }
+    .char-grid .cc-name   { font-size: .76rem; }
+    .char-grid .cc-yomi   { font-size: .53rem; }
+    .char-grid .cc-desc   { font-size: .6rem; line-height: 1.32; }
+    .char-grid .cc-role   { font-size: .6rem; line-height: 1.28; }
+
+    /* P6: ベンチマーク映画ポスター */
+    .bench-img { width:100%; height:160px; object-fit:cover; object-position:top; border-radius:4px; margin-bottom:var(--sp-xs); opacity:.9; display:block; }
+
+    /* P11-P13: シーンビジュアル */
+    .sc-img { height:105px; border-radius:4px 4px 0 0; display:flex; align-items:center; justify-content:center; margin-bottom:var(--sp-xs); overflow:hidden; position:relative; flex-shrink:0; }
+    .sc-img-kanji { font-size:4rem; font-weight:900; opacity:.18; color:#b91c1c; font-family:Georgia,"Hiragino Mincho ProN",serif; pointer-events:none; user-select:none; }
+    .sc-img-label { position:absolute; bottom:6px; left:8px; font-size:.65rem; color:rgba(185,28,28,0.7); letter-spacing:.1em; font-family:monospace; }
+  </style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ===== P1: 表紙 ===== -->
+  <section class="slide slide-title is-active">
+    <span class="label">縦型ショートプラットフォーム &nbsp;/&nbsp; Original Horror Drama</span>
+    <h1>異世界バスターズ</h1>
+    <p class="catchcopy">「転生先は、地獄だった。」</p>
+    <p class="sub">逃げたい現実を捨てて辿り着いた先は、口裂け女と花子さんが跋扈する都市伝説の世界。<br>
+    AIが解き放つ、和製クリーピーホラー。</p>
+    <div class="title-footer">
+      <span>株式会社Chammi</span>
+      <span>脚本・監督：柴田一成</span>
+    </div>
+  </section>
+
+
+  <!-- ===== P2: 企画意図 ===== -->
+  <section class="slide slide-content">
+    <div class="body">
+      <h2>なぜ今、この作品か</h2>
+      <div class="concept-box">
+        <p>「ホラームービーをAI実写×3D風の奇妙な映像でクリーピーに描く」</p>
+      </div>
+      <ul class="list">
+        <li>「異世界転生」ブームへのホラー的裏返し。<span class="accent bold">逃げ込んだ先が地獄だったら？</span></li>
+        <li>SNS炎上・いじめ・パワハラ・非正規雇用——現代の社会的弱者7人が主人公</li>
+        <li>口裂け女・花子さん・メリーさん・テケテケ・人面犬——<span class="highlight">誰もが知る都市伝説</span>を実写×AI映像でクリーピーに描く</li>
+        <li>AIが生み出す不完全な「ズレ」「違和感」こそが恐怖の源泉。完璧なリアリティより<span class="accent bold">奇妙さが怖い</span></li>
+        <li>ターゲット：<span class="accent-3 bold">10〜30代・SNS世代・縦型ショート視聴者</span></li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ===== P3: 企画概要 ===== -->
+  <section class="slide slide-content" style="--sp-xl: 3rem">
+    <div class="body">
+      <h2>主要キャラクター・あらすじ</h2>
+      <p class="overview-text">SNSに流れる「エレベーターで異世界に行く方法」を見た7人が深夜2時に全国各地で同時実行。東京・千葉・熊本・盛岡・大阪・神奈川——バラバラだった見知らぬ男女が霧に包まれた無人の住宅街に転落。そこは日本の<span class="highlight">都市伝説キャラクターが跋扈する死の異世界</span>だった。次々と仲間を失いながら、SNS炎上中の女子大生・<strong>実咲季</strong>といじめられっ子の女子高生・<strong>綺星</strong>だけが元の世界への脱出を目指す。</p>
+      <table class="char-table">
+        <thead>
+          <tr><th>名前</th><th>年齢</th><th>属性</th></tr>
+        </thead>
+        <tbody>
+          <tr class="protagonist"><td>真田実咲季（さなだ みさき）</td><td>20</td><td>SNS炎上中の強気な女子大生。主人公</td></tr>
+          <tr class="protagonist"><td>只野綺星（ただの きらら）</td><td>17</td><td>いじめられている気弱な女子高生</td></tr>
+          <tr><td>岸界人（きし かいと）</td><td>21</td><td>都市伝説に詳しいオカルトライター</td></tr>
+          <tr><td>富樫寛也（とがし ひろや）</td><td>27</td><td>派遣切りされたばかりの元会社員</td></tr>
+          <tr><td>柏木怜未（かしわぎ れな）</td><td>22</td><td>生活苦で立ちんぼをしている女性</td></tr>
+          <tr><td>今田紘明（いまだ ひろあき）</td><td>19</td><td>ネタ目的で参加した売れない大阪のYouTuber</td></tr>
+          <tr><td>野上健一（のがみ けんいち）</td><td>30</td><td>パワハラを受けていた会社員</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <!-- ===== P4: AIホラー市場事例 ===== -->
+  <section class="slide slide-content" style="--sp-xl: 2rem">
+    <div class="body">
+      <h2>AIホラーは既にバズっている——市場の証拠</h2>
+      <div class="cols-2" style="gap: var(--sp-sm); flex: 1;">
+        <a class="yt-mkt" href="https://www.youtube.com/watch?v=j-X9FbtbYdQ" target="_blank">
+          <div class="yt-mkt-thumb">
+            <img src="https://img.youtube.com/vi/j-X9FbtbYdQ/maxresdefault.jpg" alt="この映像は正常です。">
+            <div class="yt-play">▶</div>
+          </div>
+          <div class="yt-mkt-body">
+            <span class="mc-num">事例 01 / @Konoeizou_ai</span>
+            <h3>この映像は正常です。</h3>
+            <p>リミナルスペース×アナログホラー。AI生成の怪奇映像チャンネル。投稿開始3ヶ月で登録者2.8万人突破。</p>
+            <span class="mc-stat">最多動画 40万回再生突破</span>
+          </div>
+        </a>
+        <a class="yt-mkt" href="https://www.youtube.com/watch?v=37OsQbMFIhw" target="_blank">
+          <div class="yt-mkt-thumb">
+            <img src="https://img.youtube.com/vi/37OsQbMFIhw/maxresdefault.jpg" alt="遷移圏見聞録">
+            <div class="yt-play">▶</div>
+          </div>
+          <div class="yt-mkt-body">
+            <span class="mc-num">事例 02 / 遷移圏見聞録</span>
+            <h3>遷移圏見聞録</h3>
+            <p>架空の異世界が舞台のAI生成モキュメンタリー。2023年投稿開始、書籍化も果たした人気チャンネル。</p>
+            <span class="mc-stat">170万再生 / 登録者26万人</span>
+          </div>
+        </a>
+        <a class="yt-mkt" href="https://www.tiktok.com/discover/ai生成-リアル妖怪" target="_blank">
+          <div class="yt-mkt-thumb">
+            <img src="assets/tiktok-yokai.jpg" alt="TikTok AI妖怪変身動画 検索結果">
+            <div class="yt-play">↗</div>
+          </div>
+          <div class="yt-mkt-body">
+            <span class="mc-num">事例 03 / TikTok & YouTube Shorts</span>
+            <h3>AI妖怪変身動画</h3>
+            <p>AIで生成した妖怪への変身動画シリーズ。妖怪テーマはショート動画フォーマットとの相性◎。</p>
+            <span class="mc-stat">100万再生超えアカウントが多数出現</span>
+          </div>
+        </a>
+        <a class="yt-mkt" href="https://www.youtube.com/watch?v=vyeZn4Xks8E" target="_blank">
+          <div class="yt-mkt-thumb">
+            <img src="https://img.youtube.com/vi/vyeZn4Xks8E/maxresdefault.jpg" alt="Another by Dave Clark">
+            <div class="yt-play">▶</div>
+          </div>
+          <div class="yt-mkt-body">
+            <span class="mc-num">事例 04 / Dave Clark</span>
+            <h3>"Another"</h3>
+            <p>実写×AI VFXのハイブリッドホラーショート。バイラルトレーラーがSNS横断で拡散。</p>
+            <span class="mc-stat">2000万回以上再生（SNS横断）</span>
+          </div>
+        </a>
+      </div>
+      <div class="insight-box" style="font-size:.78rem; padding:.55rem .85rem;">
+        AIの「不完全さ」——ズレ・違和感——が完璧なリアリティより強い恐怖を生む。参入障壁の低下で個人スタジオがホラー市場を席巻。<span class="accent-3 bold">妖怪・都市伝説テーマはショート動画との親和性が特に高い。</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== P5: STUDIO異次元 ===== -->
+  <section class="slide slide-content" style="--sp-xl: 3rem">
+    <div class="body">
+      <h2>AIクリエイター（予定）：STUDIO異次元</h2>
+      <p class="overview-text">
+        すべてをAIで映画として成立させることに挑むAIクリエイター。
+        <span class="highlight">"No Actors. No Cameras. Just Code."</span>——
+        AI映像を「物語としての映画」に昇華した先駆者。
+        SCP財団ベースのAI映画シリーズで登録者<span class="accent bold">5.8万人突破</span>（2026年3月）。
+        WAIFF 2026（世界AIフィルムフェスティバル） ファイナリスト。
+      </p>
+      <div class="cols-4" style="flex: 1; align-items: start;">
+        <a class="yt-card" href="https://youtu.be/sZN8MylGDu0" target="_blank">
+          <div class="yt-thumb"><img src="https://img.youtube.com/vi/sZN8MylGDu0/maxresdefault.jpg" alt="SCP-2935"><div class="yt-play">▶</div></div>
+          <div class="yt-info"><h4>SCP-2935 あゝ死よ</h4><p>159万再生</p></div>
+        </a>
+        <a class="yt-card" href="https://youtu.be/61ST2u8RCwM" target="_blank">
+          <div class="yt-thumb"><img src="https://img.youtube.com/vi/61ST2u8RCwM/hqdefault.jpg" alt="SCP-2639"><div class="yt-play">▶</div></div>
+          <div class="yt-info"><h4>SCP-2639 ビデオゲーム・バイオレンス</h4><p>STUDIO異次元</p></div>
+        </a>
+        <a class="yt-card" href="https://youtu.be/vjT5sYZnqSo" target="_blank">
+          <div class="yt-thumb"><img src="https://img.youtube.com/vi/vjT5sYZnqSo/hqdefault.jpg" alt="SCP-3008"><div class="yt-play">▶</div></div>
+          <div class="yt-info"><h4>SCP-3008 完全に普通な古いイケヤ</h4><p>STUDIO異次元</p></div>
+        </a>
+        <a class="yt-card" href="https://youtu.be/WhsXh8UC3qY" target="_blank">
+          <div class="yt-thumb"><img src="https://img.youtube.com/vi/WhsXh8UC3qY/hqdefault.jpg" alt="SCP-100-JP"><div class="yt-play">▶</div></div>
+          <div class="yt-info"><h4>SCP-100-JP 屋根裏部屋の宇宙</h4><p>STUDIO異次元</p></div>
+        </a>
+      </div>
+      <div class="studio-links">
+        受賞：SakuraRin 妖怪パレード 受賞（2025） / Hailuo AI ワークショップ 登壇（2026） / 日韓映画祭 開催（Sakura Rin × MBC C&I × STUDIO異次元）&emsp;
+        <a href="https://www.youtube.com/@CreepyTheater_K/videos" target="_blank">YouTube ↗</a>&emsp;
+        <a href="https://creepy-theater.com" target="_blank">公式サイト ↗</a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== P6: ベンチマーク ===== -->
+  <section class="slide slide-content">
+    <div class="body">
+      <h2>ホラーを知り尽くした監督が、AI縦型という新フォーマットに挑む。</h2>
+      <div class="cols-3" style="flex: 1;">
+        <div class="card card-blue" style="padding:0; overflow:hidden;">
+          <img class="bench-img" src="https://media.eiga.com/images/movie/53284/photo/335c94cbe7b949dc/640.jpg" alt="リアル鬼ごっこ 2008 キービジュアル">
+          <div style="padding: var(--sp-sm);">
+            <span class="badge" style="margin-bottom: var(--sp-xs);">監督作 / 参照元</span>
+            <h3>リアル鬼ごっこ</h3>
+            <p style="font-size: var(--text-sm);">2008／柴田一成 監督・脚本。山田悠介原作をスマッシュヒットに。「弱者が異常な世界で生き延びる」構造の原点。<span class="accent bold">→ 監督実績の証明</span></p>
+          </div>
+        </div>
+        <div class="card card-blue" style="padding:0; overflow:hidden;">
+          <img class="bench-img" src="https://media.themoviedb.org/t/p/w500/2C4osqxk83jtpwMMaLIF9C44PYs.jpg" alt="がっこうぐらし！ 2019 ポスター">
+          <div style="padding: var(--sp-sm);">
+            <span class="badge" style="margin-bottom: var(--sp-xs);">監督作 / 参照元</span>
+            <h3>がっこうぐらし！</h3>
+            <p style="font-size: var(--text-sm);">2019／柴田一成 監督・脚本。秋元康P、ラストアイドル主演。ゾンビ×学校×少女という本作と共鳴するテーマ。<span class="accent bold">→ ホラー×若者コンテンツへの適性を証明</span></p>
+          </div>
+        </div>
+        <div class="card card-blue" style="padding:0; overflow:hidden;">
+          <img class="bench-img" src="https://media.themoviedb.org/t/p/w500/2uazUZPpOs8dEPOJcdVmzcZ49KI.jpg" alt="世にも奇妙な物語 2023 キービジュアル">
+          <div style="padding: var(--sp-sm);">
+            <span class="badge badge-yellow" style="margin-bottom: var(--sp-xs);">参照フォーマット</span>
+            <h3>世にも奇妙な物語</h3>
+            <p style="font-size: var(--text-sm);">1990〜／フジテレビ。都市伝説・超常現象・社会的テーマを短編形式で30年以上愛される日本最長寿ホラー。<span class="accent bold">→ 1話完結・繰り返し見られるショートホラーの最高リファレンス</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== P7: 都市伝説敵キャラクター紹介 ===== -->
+  <section class="slide slide-content" style="--sp-xl: 1.5rem">
+    <div class="body">
+      <h2>都市伝説敵キャラクター紹介</h2>
+      <div class="char-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; flex:1; align-items:start;">
+
+        <!-- 口裂け女 -->
+        <div class="char-card">
+          <img class="cc-img" src="assets/kuchisake.jpg" alt="口裂け女" style="object-position:center top;">
+          <div class="cc-body">
+            <span class="cc-name">口裂け女</span>
+            <span class="cc-yomi">KUCHISAKE-ONNA</span>
+            <p class="cc-desc">マスクで口元を隠した長身の女。「私、きれい？」と問いかけ、マスクを外すと口が耳まで裂けている。出刃包丁を携行。</p>
+            <span class="cc-role">▶ 界人の胸を包丁で刺す。最後は界人が体を張って押さえ込み共に絶命。</span>
+          </div>
+        </div>
+
+        <!-- テケテケ -->
+        <div class="char-card">
+          <img class="cc-img" src="assets/teketeke.jpg" alt="テケテケ" style="object-position:center top;">
+          <div class="cc-body">
+            <span class="cc-name">テケテケ</span>
+            <span class="cc-yomi">TEKE-TEKE</span>
+            <p class="cc-desc">電車にひかれ上半身のみとなった女子高生の霊。両肘で地面を叩く音から命名。常人を超える速度で追跡する。</p>
+            <span class="cc-role">▶ 野上の鼻を食いちぎり、腹を手で切り裂いて最初の死者に。</span>
+          </div>
+        </div>
+
+        <!-- メリーさん -->
+        <div class="char-card">
+          <img class="cc-img" src="assets/mary.jpg" alt="メリーさん" style="object-position:center top;">
+          <div class="cc-body">
+            <span class="cc-name">メリーさん</span>
+            <span class="cc-yomi">MARY-SAN / THE DOLL</span>
+            <p class="cc-desc">捨てられた外国製人形の霊。プラスチックの顔。圏外のスマホに「いまがっこうのまえ」と着信し、段々近づいてくる。</p>
+            <span class="cc-role">▶ 今田の首を一回転させ絶命。富樫の後頭部にナイフを刺し殺害。最凶の殺害数2名。</span>
+          </div>
+        </div>
+
+        <!-- 花子さん -->
+        <div class="char-card">
+          <img class="cc-img" src="assets/hanako.jpg" alt="花子さん" style="object-position:center top;">
+          <div class="cc-body">
+            <span class="cc-name">トイレの花子さん</span>
+            <span class="cc-yomi">HANAKO-SAN</span>
+            <p class="cc-desc">廃校の三階女子トイレ、三番目の扉から現れる赤い吊りスカートの美形少女。召喚に応じて現れるが、その正体は罠。</p>
+            <span class="cc-role">▶ 味方のふりをしてエレベーターに乗り込む。合わせ鏡（あわせかがみ）で撃破される。</span>
+          </div>
+        </div>
+
+        <!-- 大女（カシマレイコ） -->
+        <div class="char-card">
+          <img class="cc-img" src="assets/oonna.jpg" alt="大女（カシマレイコ）" style="object-position:center top;">
+          <div class="cc-body">
+            <span class="cc-name">大女（カシマレイコ）</span>
+            <span class="cc-yomi">ŌONNA / KASHIMA REIKO</span>
+            <p class="cc-desc">白い着物を着た異常に巨大な女の霊。両脚を失った呪いの霊。「脚はどこ？」の問いに答えられない者を殺す。</p>
+            <span class="cc-role">▶ 怜未を壁に叩きつけ殺害。3人がかりで倒されるが、直後にメリーが富樫を刺す。</span>
+          </div>
+        </div>
+
+        <!-- 老婆 -->
+        <div class="char-card">
+          <img class="cc-img" src="assets/roba.jpg" alt="老婆" style="object-position:center top;">
+          <div class="cc-body">
+            <span class="cc-name">老婆</span>
+            <span class="cc-yomi">RŌBA</span>
+            <p class="cc-desc">異なる家から同じ顔が出現するループ怪異。無言で見つめ、異常な速度で追跡してくる。</p>
+            <span class="cc-role">▶ 綺星の首を絞める。野上が投げ飛ばし撃退。</span>
+          </div>
+        </div>
+
+        <!-- 人面犬 -->
+        <div class="char-card">
+          <img class="cc-img" src="assets/jinmenken.jpg" alt="人面犬" style="object-position:center top;">
+          <div class="cc-body">
+            <span class="cc-name">人面犬</span>
+            <span class="cc-yomi">JINMENKEN</span>
+            <p class="cc-desc">犬コスプレの男が四つん這いで突然出現する謎の怪異。「わんっ」の一声で一同を腰砕けにさせる。</p>
+            <span class="cc-role">▶ 死者を呼び寄せる遠吠えで間接的に追い詰める。</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== P8: ストーリー① 現実〜異世界到着 ===== -->
+  <section class="slide slide-content" style="--sp-xl: 2.5rem">
+    <div class="body">
+      <h2>ストーリー全体構成 ① 現実世界〜異世界</h2>
+      <div class="ep-log">
+        <div class="ep-col">
+          <div class="ep-section-title">現実世界・各人物の日常</div>
+          <div class="ep-item"><span class="ep-num">#1</span>実咲季の現実｜キャンパスでSNS炎上の誹謗中傷に一人で傷つく女子大生</div>
+          <div class="ep-item"><span class="ep-num">#2</span>富樫の現実｜千葉で派遣先に頭を下げながら「死ね」と言われ電柱を蹴る</div>
+          <div class="ep-item"><span class="ep-num">#3</span>怜未の現実｜熊本の裏通りでつまらなそうにスマホをいじる立ちんぼ</div>
+          <div class="ep-item"><span class="ep-num">#4</span>野上の現実｜盛岡の公園で缶ビールを飲みながら会社に行ったふりをする</div>
+          <div class="ep-item"><span class="ep-num">#5</span>綺星の現実｜高校トイレで頭から水をかけられ無言で耐えるいじめられっ子</div>
+          <div class="ep-item"><span class="ep-num">#6</span>今田の現実｜大阪の車内で「いいねも登録者も増えない」と天井を見つめる</div>
+          <div class="ep-item"><span class="ep-num">#7</span>界人の現実｜神奈川でオカルト誌の原稿「ヤバい間取り」をPCに打ち込む</div>
+          <div class="ep-section-title">SNS発見</div>
+          <div class="ep-item"><span class="ep-num">#8</span>深夜のSNS｜実咲季が「一緒に異世界に行ってみませんか？」投稿を発見</div>
+          <div class="ep-item"><span class="ep-num">#9</span>連鎖する衝動｜富樫・怜未・野上・綺星・今田・界人が次々と同じ投稿に辿り着く</div>
+          <div class="ep-item"><span class="ep-num">#10</span>エレベーターの手順｜「4→2→6→2→10→5。決行は深夜2時」</div>
+        </div>
+        <div class="ep-col">
+          <div class="ep-section-title">深夜実行</div>
+          <div class="ep-item"><span class="ep-num">#11</span>ビル探し｜実咲季が10階以上のエレベーターを求めて都内を歩き回る</div>
+          <div class="ep-item"><span class="ep-num">#12</span>乗り込む｜薄汚いビルの古びたエレベーター、ぎしぎしと軋む音</div>
+          <div class="ep-item"><span class="ep-num">#13</span>手順実行｜4→2→6→2→10→5。照明が明滅する中ボタンを押し続ける</div>
+          <div class="ep-item"><span class="ep-num">#14</span>白い手｜「やっぱあり得ない」と苦笑した瞬間、閉じる扉に白い手が</div>
+          <div class="ep-item"><span class="ep-num">#15</span>10階へ｜1階を押したのにエレベーターが上昇。後ろの女が口元でニタリ</div>
+          <div class="ep-item"><span class="ep-num">#16</span>扉が開く｜10階。飛び出した先に広がるのは——霧に包まれた異世界</div>
+          <div class="ep-section-title">異世界到着・自己紹介</div>
+          <div class="ep-item"><span class="ep-num">#17</span>集結｜霧の中から7人が次々と現れる。「うそだろ？」「ほんまに異世界？」</div>
+          <div class="ep-item"><span class="ep-num">#18</span>自己紹介｜電波なし・スマホ圏外。場所もバラバラだった7人、初めて顔を合わせる</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== P9: ストーリー② 都市伝説との遭遇〜廃校 ===== -->
+  <section class="slide slide-content" style="--sp-xl: 2.5rem">
+    <div class="body">
+      <h2>ストーリー全体構成 ② 都市伝説との遭遇</h2>
+      <div class="ep-log">
+        <div class="ep-col">
+          <div class="ep-section-title">老婆エンカウンター</div>
+          <div class="ep-item"><span class="ep-num">#19</span>民家訪問｜インターホンを鳴らすと老婆が無言で見つめる</div>
+          <div class="ep-item"><span class="ep-num">#20</span>同じ老婆｜向かいの民家を訪ねると——またあの老婆が。一同逃走</div>
+          <div class="ep-item"><span class="ep-num">#21</span>追跡｜老婆が異常なスピードで追いかけてくる。綺星の首を絞める</div>
+          <div class="ep-item"><span class="ep-num">#22</span>投げ飛ばし｜野上が老婆を掴んで投げ飛ばし、全員で走って脱出</div>
+          <div class="ep-section-title">口裂け女エンカウンター</div>
+          <div class="ep-item"><span class="ep-num">#23</span>赤いコートの女｜逃げてきた実咲季が長身の女にぶつかる</div>
+          <div class="ep-item"><span class="ep-num">#24</span>マスクを外せ｜「よく聞こえない、マスクとって」——外れた顔は裂けていた</div>
+          <div class="ep-item"><span class="ep-num">#25</span>包丁｜出刃包丁を振り上げた口裂け女の一撃。今田の頬をかすめて木に刺さる</div>
+          <div class="ep-section-title">テケテケ出現</div>
+          <div class="ep-item"><span class="ep-num">#26</span>這う少女｜角から腹を裂いて内臓を引きずった女子高生が這い出てくる</div>
+          <div class="ep-item"><span class="ep-num">#27</span>食いちぎり｜助けようとした野上の鼻を少女が食いちぎる</div>
+          <div class="ep-item"><span class="ep-num">#28</span>野上の死｜少女が野上の腹を手で切り裂く。富樫に血が降りかかる</div>
+        </div>
+        <div class="ep-col">
+          <div class="ep-section-title">人面犬出現</div>
+          <div class="ep-item"><span class="ep-num">#29</span>わんっ｜野上の死体の傍に犬コスプレの男が四つん這いで出現、一同腰を抜かす</div>
+          <div class="ep-section-title">廃校へ</div>
+          <div class="ep-item"><span class="ep-num">#30</span>廃校発見｜綺星が「あそこ、学校があります」と指さす</div>
+          <div class="ep-item"><span class="ep-num">#31</span>立てこもり｜校門・校舎の扉を閉め、窓を閉め、バリケードを構築</div>
+          <div class="ep-item"><span class="ep-num">#32</span>都市伝説解説｜界人「学校は都市伝説が生まれる場所」</div>
+          <div class="ep-section-title">コンビニ買い出し</div>
+          <div class="ep-item"><span class="ep-num">#33</span>食料調達｜近くのコンビニへ。棚には商品が並ぶ——この世界は同じ構造</div>
+          <div class="ep-item"><span class="ep-num">#34</span>縋りつく死者｜コンビニ奥から死者が出現。外にも群れ。野上の姿も</div>
+          <div class="ep-item"><span class="ep-num">#35</span>死者の正体｜界人「この世界で死んだ者たちが救いを求めて群がってくる」</div>
+          <div class="ep-item"><span class="ep-num">#36</span>撤収｜富樫がモップで死者を突き放し、校門内に逃げ込む</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== P10: ストーリー③ メリーさん〜ラスト ===== -->
+  <section class="slide slide-content" style="--sp-xl: 2.5rem">
+    <div class="body">
+      <h2>ストーリー全体構成 ③ メリーさん〜ラスト</h2>
+      <div class="ep-log">
+        <div class="ep-col">
+          <div class="ep-section-title">メリーさん登場</div>
+          <div class="ep-item"><span class="ep-num">#37</span>着信｜今田のスマホにメッセージ「いま、がっこうのまえ」——差出人：Mary</div>
+          <div class="ep-item"><span class="ep-num">#38</span>迫る｜「いま、こうしゃのなか」——電波がないはずなのに</div>
+          <div class="ep-item"><span class="ep-num">#39</span>うしろ｜「いま……うしろ」。界人の「振り返っちゃだめ！」が間に合わず</div>
+          <div class="ep-item"><span class="ep-num">#40</span>今田の死｜首が一回転して絶命。プラスチックの顔の人形少女が消える</div>
+          <div class="ep-section-title">怜未・富樫の死</div>
+          <div class="ep-item"><span class="ep-num">#41</span>逃走｜パニックになった怜未が飛び出し行方不明に</div>
+          <div class="ep-item"><span class="ep-num">#42</span>大女（カシマレイコ）出現｜白い着物の巨大な女が怜未を壁に叩きつけて殺害</div>
+          <div class="ep-item"><span class="ep-num">#43</span>富樫の怒り｜「毎日パワハラしやがって！」——大女にハンマーで反撃</div>
+          <div class="ep-item"><span class="ep-num">#44</span>大女打倒｜3人がかりでついに大女を倒す</div>
+          <div class="ep-item"><span class="ep-num">#45</span>メリーの一刺し｜富樫の死角からメリーがナイフを後頭部に。富樫絶命</div>
+          <div class="ep-section-title">メリー撃破・脱出決意</div>
+          <div class="ep-item"><span class="ep-num">#46</span>3人がかり｜実咲季・界人・綺星がメリーの逃げ場を塞ぎスコップで撃破</div>
+          <div class="ep-item"><span class="ep-num">#47</span>死者の侵入｜今田・怜未の死者が校門を開け死者の群れが侵入</div>
+          <div class="ep-item"><span class="ep-num">#48</span>脱出決意｜綺星「ビル街には10階建てもある。異世界のエレベーターを試そう」</div>
+        </div>
+        <div class="ep-col">
+          <div class="ep-section-title">口裂け女との死闘・界人の死</div>
+          <div class="ep-item"><span class="ep-num">#49</span>逃走開始｜3人がベランダから避難はしごで脱出、街を走る</div>
+          <div class="ep-item"><span class="ep-num">#50</span>さとる着信｜スマホにメッセージ。遅すぎるさとる</div>
+          <div class="ep-item"><span class="ep-num">#51</span>犬男の遠吠え｜犬男に見つかり、死者が四方から押し寄せる</div>
+          <div class="ep-item"><span class="ep-num">#52</span>口裂け女再来｜街で口裂け女が再出現、界人が胸を刺される</div>
+          <div class="ep-item"><span class="ep-num">#53</span>綺星が掴む｜口裂け女の腕に飛びつく綺星。吹き飛ばされながら時間を稼ぐ</div>
+          <div class="ep-item"><span class="ep-num">#54</span>界人の最後｜「行って！絶対、元の世界に戻って！」——口裂け女を押さえたまま絶命</div>
+          <div class="ep-item"><span class="ep-num">#55</span>包丁が背中に｜投げられた包丁が綺星の背中に——ポーチに刺さり命拾い</div>
+          <div class="ep-section-title">エレベーター再挑戦</div>
+          <div class="ep-item"><span class="ep-num">#56</span>たどり着く｜消火器で死者を散らし、実咲季が綺星を背負ってビルへ</div>
+          <div class="ep-item"><span class="ep-num">#57</span>手順再実行｜4→2→6→2→10→5。今度は2人で</div>
+          <div class="ep-item"><span class="ep-num">#58</span>花子（大人版）登場｜5階で扉が開き、成長した花子が乗り込んでくる</div>
+          <div class="ep-item"><span class="ep-num">#59</span>さとるの答え｜「あわせかがみ」</div>
+          <div class="ep-item"><span class="ep-num">#60</span>鏡を割る｜車椅子用の鏡をスコップで割り、破片を2人で合わせる</div>
+          <div class="ep-item"><span class="ep-num">#61</span>花子苦悶｜花子が叫び声を上げ、10階の扉が開く——ホワイトアウト</div>
+          <div class="ep-section-title">新たな異世界へ（END）</div>
+          <div class="ep-item"><span class="ep-num">#62</span>森の入口｜「KEEP OUT」の看板。サイレンヘッドが不気味に鳴り響く</div>
+          <div class="ep-item"><span class="ep-num">#63</span>米国都市伝説｜スレンダーマン・フラットウッズ・キラークラウンに囲まれる</div>
+          <div class="ep-item"><span class="ep-num">#64–66</span>二人の覚悟｜「元に戻りたくなかった」「じゃ、いくよ！」スコップを振り上げ、新たな戦いへ——<span class="accent bold">END</span></div>
+          <div class="ep-item"><span class="ep-num">#67–68</span>エンドロール後｜次の犠牲者へ。ループするホラー</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== P11: 切り抜き要素（全8シーン） ===== -->
+  <section class="slide slide-content" style="--sp-xl: 2rem">
+    <div class="body">
+      <h2>切り抜き要素——全8シーン</h2>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:var(--sp-sm); flex:1; align-items:start;">
+
+        <div class="scene-card" style="padding:.6rem .8rem; gap:.28rem;">
+          <span style="font-size:.6rem; color:var(--color-accent); letter-spacing:.08em; font-family:monospace;">EP.#13–16 / ELEVATOR</span>
+          <span class="sc-title" style="font-size:.82rem;">エレベーター儀式——ボタンを押す手</span>
+          <p class="sc-body" style="font-size:.7rem;">震える手でボタンを押す実咲季。閉じる寸前に扉を阻む白い手。背後に長い黒髪の女。「1階を押したのに表示が上昇していく」——</p>
+          <span class="sc-trigger" style="font-size:.65rem;">「実際やってみた」系ショート展開可能。日本中のエレベーターが怖くなる。</span>
+        </div>
+
+        <div class="scene-card" style="padding:.6rem .8rem; gap:.28rem;">
+          <span style="font-size:.6rem; color:var(--color-accent); letter-spacing:.08em; font-family:monospace;">EP.#23–25 / KUCHISAKE-ONNA</span>
+          <span class="sc-title" style="font-size:.82rem;">口裂け女のマスク剥ぎ</span>
+          <p class="sc-body" style="font-size:.7rem;">「マスクとって話してくれますか」——外れた顔に裂けた口。包丁を振り上げ突進。今田の頬をかすめた包丁が木に刺さる。</p>
+          <span class="sc-trigger" style="font-size:.65rem;">「AIで再現された口裂け女」がそのままバズワードに。最大の視覚的インパクト。</span>
+        </div>
+
+        <div class="scene-card" style="padding:.6rem .8rem; gap:.28rem;">
+          <span style="font-size:.6rem; color:var(--color-accent); letter-spacing:.08em; font-family:monospace;">EP.#26–28 / TEKE-TEKE</span>
+          <span class="sc-title" style="font-size:.82rem;">テケテケが野上を食い殺す</span>
+          <p class="sc-body" style="font-size:.7rem;">腹の裂けた女子高生が這いながら迫り、野上の鼻を食いちぎる。AIの3D風表現でリアルとアンリアルの境界を攻める。</p>
+          <span class="sc-trigger" style="font-size:.65rem;">「AIでここまで描けるのか」という驚き。視覚的インパクト×グロテスク。</span>
+        </div>
+
+        <div class="scene-card" style="padding:.6rem .8rem; gap:.28rem;">
+          <span style="font-size:.6rem; color:var(--color-accent); letter-spacing:.08em; font-family:monospace;">EP.#19–22 / LOOP OBĀCHAN</span>
+          <span class="sc-title" style="font-size:.82rem;">二つの家から同じ老婆が出てくる</span>
+          <p class="sc-body" style="font-size:.7rem;">インターホンを押すと老婆が無言で見つめる。向かいの家を訪ねると——また同じ老婆。そして異常なスピードで追いかけてくる。</p>
+          <span class="sc-trigger" style="font-size:.65rem;">「ゆっくりした恐怖→爆発的な追跡」の緩急がショートに最適。</span>
+        </div>
+
+        <div class="scene-card" style="padding:.6rem .8rem; gap:.28rem;">
+          <span style="font-size:.6rem; color:var(--color-accent); letter-spacing:.08em; font-family:monospace;">EP.#37–40 / MARY-SAN</span>
+          <span class="sc-title" style="font-size:.82rem;">メリーさんの着信連鎖</span>
+          <p class="sc-body" style="font-size:.7rem;">圏外のスマホに突然着信。「いま、がっこうのまえ」→「いま、こうしゃのなか」→「いま……うしろ」。今田が振り返り、首が一回転。</p>
+          <span class="sc-trigger" style="font-size:.65rem;">テキスト演出が縦型ショートと完全一致。「絶対に振り返ってはいけない」が視聴者を能動参加させる。</span>
+        </div>
+
+        <div class="scene-card" style="padding:.6rem .8rem; gap:.28rem;">
+          <span style="font-size:.6rem; color:var(--color-accent); letter-spacing:.08em; font-family:monospace;">EP.#29 / JINMENKEN</span>
+          <span class="sc-title" style="font-size:.82rem;">人面犬の出現</span>
+          <p class="sc-body" style="font-size:.7rem;">血だらけの野上の死体の傍に、犬コスプレの男が四つん這いで現れ「わんっ！」。一同が将棋倒しになって尻もちをつく。</p>
+          <span class="sc-trigger" style="font-size:.65rem;">「怖い×笑える」が混在する唯一のシーン。コメント欄が荒れる系の爆発力あり。</span>
+        </div>
+
+        <div class="scene-card" style="padding:.6rem .8rem; gap:.28rem;">
+          <span style="font-size:.6rem; color:var(--color-accent); letter-spacing:.08em; font-family:monospace;">EP.#32 / HANAKO-SAN</span>
+          <span class="sc-title" style="font-size:.82rem;">花子さんの召喚シーン</span>
+          <p class="sc-body" style="font-size:.7rem;">三番目の扉を三回ノック「はーなーこさん」。電気が明滅し、三人の背後に突然、赤い吊りスカートの美形少女が立っている。</p>
+          <span class="sc-trigger" style="font-size:.65rem;">「実際に学校のトイレで試せる」都市伝説性。ビジュアルショックがショートに最適。</span>
+        </div>
+
+        <div class="scene-card" style="padding:.6rem .8rem; gap:.28rem;">
+          <span style="font-size:.6rem; color:var(--color-accent); letter-spacing:.08em; font-family:monospace;">EP.#64–66 / FINAL RESOLVE</span>
+          <span class="sc-title" style="font-size:.82rem;">実咲季と綺星の最後の覚悟</span>
+          <p class="sc-body" style="font-size:.7rem;">「元のつらい世界に戻りたくなかった」「正直あたしも、心から戻りたいって世界じゃないし」——手を繋ぎ、スコップを振り上げ走り出す。</p>
+          <span class="sc-trigger" style="font-size:.65rem;">逃げ場のない現実と異世界の地獄が同等になる瞬間。「逃げることをやめた二人」が視聴者の共感を爆発させる。</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== P14: 制作体制 ===== -->
+  <section class="slide slide-content">
+    <div class="body">
+      <h2>制作体制</h2>
+      <div class="cols-2" style="flex: 1; align-items: start; gap: var(--sp-xl);">
+        <table class="prod-table">
+          <tr><td>制作会社</td><td>株式会社Chammi</td></tr>
+          <tr><td>脚本・監督</td><td>柴田一成</td></tr>
+          <tr><td>AI映像制作（候補）</td><td>STUDIO異次元（クリエイターK）</td></tr>
+          <tr><td>プラットフォーム</td><td>縦型ショートプラットフォーム</td></tr>
+          <tr><td>制作期間</td><td>約1ヶ月</td></tr>
+        </table>
+        <div style="display: flex; flex-direction: column; gap: var(--sp-md);">
+          <div>
+            <p class="overview-text" style="font-size: var(--text-xs); color: var(--color-accent); letter-spacing: .08em; text-transform: uppercase; font-weight: var(--weight-bold); margin-bottom: .4rem;">監督略歴 / 柴田一成</p>
+            <p class="overview-text">東京都出身。パイオニアLDC（現NBCユニバーサル）入社後フリーへ。2002年『もうひとりいる』で監督デビュー。山田悠介原作<span class="accent bold">『リアル鬼ごっこ』（2008）</span>脚本・監督でスマッシュヒット。<span class="accent bold">『がっこうぐらし！』（2019）</span>監督・脚本。プロデューサーとして『渋谷怪談』『姑獲鳥の夏』『魍魎の匣』等多数。</p>
+          </div>
+          <div>
+            <p class="overview-text" style="font-size: var(--text-xs); color: var(--color-accent); letter-spacing: .08em; text-transform: uppercase; font-weight: var(--weight-bold); margin-bottom: .4rem;">AI映像パートナー / STUDIO異次元</p>
+            <p class="overview-text"><span class="highlight">"No Actors. No Cameras. Just Code."</span><br>
+            SCP財団ベースのAI映画シリーズで159万回再生を記録。登録者5.8万人。WAIFF 2026 ファイナリスト。</p>
+            <div class="studio-links" style="margin-top: .4rem;">
+              <a href="https://creepy-theater.com" target="_blank">公式サイト: creepy-theater.com ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /.deck -->
+
+<!-- ── ナビUI ── -->
+<div class="slide-ui">
+  <div class="slide-counter">01 / 12</div>
+  <div class="slide-nav">
+    <button id="btn-prev">← Prev</button>
+    <button id="btn-next">Next →</button>
+    <button id="btn-pdf" title="PDF書き出し">PDF</button>
+    <button id="btn-fs" title="フルスクリーン (F)">⛶</button>
+  </div>
+</div>
+
+<script src="../../engine/slide.js"></script>
+</body>
+</html>

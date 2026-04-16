@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ':*)",
+      "Bash(pip install:*)",
+      "WebSearch",
+      "WebFetch(domain:kai-you.net)",
+      "WebFetch(domain:note.com)",
+      "WebFetch(domain:daveclarkcreative.com)",
+      "WebFetch(domain:x.com)",
+      "WebFetch(domain:www.youtube.com)",
+      "Bash(xargs ls:*)",
+      "Bash(python3 -)",
+      "Bash(ffmpeg -version)",
+      "Bash(npm --version)",
+      "Bash(npm install:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)"
+    ]
+  }
+}

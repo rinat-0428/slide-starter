@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PENROSE 破 星めぐりの歌 — 企画書</title>
+  <link rel="stylesheet" href="../../engine/slide.css">
+  <link rel="stylesheet" href="../../theme/penrose.css">
+  <style>
+    /* character/story tables */
+    .char-table { width: 100%; border-collapse: collapse; }
+    .char-table th { font-size: var(--text-sm); font-weight: 700; color: var(--color-accent); text-align: left; padding: .4rem .6rem; border-bottom: 2px solid rgba(196,150,59,.25); letter-spacing: .06em; }
+    .char-table td { font-size: var(--text-sm); color: var(--color-muted); padding: .4rem .6rem; border-bottom: 1px solid var(--color-border); vertical-align: top; line-height: 1.55; }
+    .char-table td:first-child { font-weight: 700; color: var(--color-fg); white-space: nowrap; min-width: 8rem; }
+    .char-table tbody tr:hover td { background: rgba(196,150,59,.03); }
+
+    /* episode log (P8, P9, P10) */
+    .ep-log { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-md); flex: 1; overflow: hidden; }
+    .ep-col { display: flex; flex-direction: column; gap: .32rem; }
+    .ep-section-title { font-size: .68rem; font-weight: 700; color: var(--color-accent); letter-spacing: .1em; text-transform: uppercase; padding: .18rem 0; border-bottom: 1px solid rgba(196,150,59,.2); margin-bottom: .12rem; font-family: Georgia, serif; }
+    .ep-item { font-size: .74rem; color: var(--color-muted); line-height: 1.48; display: flex; gap: .45rem; }
+    .ep-num { color: var(--color-accent); font-family: Georgia, serif; font-size: .68rem; font-weight: 700; flex-shrink: 0; min-width: 2rem; }
+
+    /* character design card */
+    .char-design-card { display: flex; flex-direction: column; gap: .5rem; }
+    .char-design-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; flex: 1; min-height: 0; }
+    .char-design-img { border-radius: 6px; overflow: hidden; background: rgba(28,26,40,.05); position: relative; display: flex; align-items: center; justify-content: center; min-height: 180px; }
+    .char-design-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .char-design-img .placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; width: 100%; height: 100%; padding: 1rem; }
+    .char-design-label { font-size: .62rem; color: var(--color-accent); letter-spacing: .1em; font-family: Georgia, serif; text-transform: uppercase; position: absolute; bottom: 6px; left: 8px; }
+    .char-coming-soon { display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(28,26,40,.025); border: 1px dashed rgba(28,26,40,.15); border-radius: 6px; gap: .35rem; padding: .6rem; }
+    .char-coming-soon .cs-name { font-size: .72rem; font-weight: 700; color: var(--color-fg); }
+    .char-coming-soon .cs-label { font-size: .58rem; color: rgba(28,26,40,.3); letter-spacing: .12em; font-family: Georgia, serif; }
+
+    /* relationship diagram */
+    .rel-diagram { flex: 1; display: grid; grid-template-columns: 1fr 2fr 1fr; grid-template-rows: 1fr auto 1fr; gap: var(--sp-sm); align-items: center; }
+    .rel-node { background: var(--color-card-bg); border: var(--border); border-radius: var(--radius); padding: .5rem .7rem; text-align: center; }
+    .rel-node.center { background: rgba(196,150,59,.08); border-color: rgba(196,150,59,.35); border-radius: 50%; width: 120px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: auto; }
+    .rel-node .rn-name { font-size: .82rem; font-weight: 800; color: var(--color-fg); }
+    .rel-node .rn-role { font-size: .6rem; color: var(--color-accent); letter-spacing: .06em; }
+    .rel-node .rn-desc { font-size: .58rem; color: var(--color-muted); line-height: 1.4; margin-top: .25rem; }
+    .rel-arrow { font-size: .75rem; color: var(--color-accent); text-align: center; }
+
+    /* scene cards (P11) */
+    .scene-card { background: rgba(28,26,40,.03); border: 1px solid rgba(28,26,40,.1); border-left: 3px solid var(--color-accent); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--sp-sm) var(--sp-md); display: flex; flex-direction: column; gap: .4rem; flex: 1; }
+    .scene-card .sc-num { font-size: .62rem; color: var(--color-accent); letter-spacing: .1em; font-family: Georgia, serif; }
+    .scene-card .sc-title { font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--color-fg); line-height: 1.3; }
+    .scene-card .sc-body { font-size: var(--text-sm); color: var(--color-muted); line-height: 1.62; flex: 1; }
+    .scene-card .sc-trigger { font-size: .7rem; font-weight: 500; color: var(--color-accent-3); letter-spacing: .03em; border-top: 1px solid rgba(196,150,59,.15); padding-top: .3rem; margin-top: .2rem; }
+
+    /* video frame placeholders (P12) */
+    .video-frame { border-radius: 6px; overflow: hidden; background: #0f0e1a; position: relative; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; }
+    .video-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .video-frame .vf-label { position: absolute; bottom: 6px; left: 8px; font-size: .58rem; color: rgba(196,150,59,.6); font-family: Georgia, serif; letter-spacing: .08em; }
+
+    /* production table */
+    .prod-table { width: 100%; border-collapse: collapse; }
+    .prod-table td { font-size: var(--text-sm); padding: .55rem .7rem; border-bottom: 1px solid var(--color-border); color: var(--color-muted); line-height: 1.55; vertical-align: top; }
+    .prod-table td:first-child { font-weight: 700; color: var(--color-fg); white-space: nowrap; width: 10rem; }
+  </style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ===== P1: 表紙 ===== -->
+  <section class="slide slide-title is-active">
+    <span class="label serif" style="letter-spacing:.15em;">AI Anime Series · 縦型ショート</span>
+    <div style="display:flex;flex-direction:column;gap:.5rem;">
+      <h1>PENROSE</h1>
+      <p style="font-family:Georgia,serif;font-size:var(--text-xl);color:rgba(196,150,59,.75);letter-spacing:.2em;font-weight:400;">破&emsp;星めぐりの歌</p>
+    </div>
+    <div style="width:48px;height:1px;background:rgba(196,150,59,.35);"></div>
+    <h2 style="font-size:var(--text-3xl);color:#f0ebe0;line-height:1.2;font-weight:700;">「幽霊も、依頼人。」</h2>
+    <p style="color:rgba(240,235,224,.6);max-width:540px;line-height:1.72;font-size:var(--text-lg);">
+      死者を代弁する小説家がいる。<br>AIアニメが解き放つ、ちょっとおかしな死と愛の物語。
+    </p>
+    <p style="font-size:var(--text-xs);margin-top:auto;color:rgba(240,235,224,.3);letter-spacing:.04em;">
+      株式会社Chammi &nbsp;/&nbsp; 脚本：PENROSE &nbsp;/&nbsp; 監督：髙橋 果子 &nbsp;/&nbsp; キャラクターデザイン：あらためやむ
+    </p>
+  </section>
+
+  <!-- ===== P2: 企画意図 ===== -->
+  <section class="slide slide-content">
+    <div class="body">
+      <h2>なぜ今、この作品か</h2>
+      <p style="font-size:var(--text-lg);font-weight:700;color:var(--color-fg);line-height:1.4;">「"死者"を題材としたミステリー・コメディを、味のあるAIアニメで表現する」</p>
+      <ul class="list">
+        <li>死者を代弁する「故人専門小説家」という唯一無二の職業設定</li>
+        <li>幽霊・死者・葬儀社が日常に溶け込むダーク×ユーモアの世界観</li>
+        <li>死をコメディに——「怖い」より「おかしい」「切ない」後味</li>
+        <li>AIアニメ特有の「不完全な動き」「奇妙な質感」が、この世とあの世の境界を絶妙に演出</li>
+        <li>ターゲット：20〜40代、ミステリー・コメディ好き</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== P3: 企画概要 ===== -->
+  <section class="slide slide-content" style="--sp-xl:2.5rem;">
+    <div class="body">
+      <h2>主要キャラクター・あらすじ</h2>
+      <div class="cols-2" style="gap:var(--sp-lg);flex:1;align-items:start;">
+        <!-- LEFT: あらすじ -->
+        <div style="display:flex;flex-direction:column;gap:var(--sp-sm);">
+          <h3>あらすじ</h3>
+          <p style="font-size:var(--text-sm);line-height:1.7;">東京・中野の葬儀社ビルに事務所を構える"故人専門小説家"・井浦。遺族の依頼を受け、突然亡くなった人の死の状況から「フィクションの物語」を書く——ただし事実をそのまま書くのではなく、ペンローズの三角形のように「優しい嘘」をついた作品として。見習いアシスタントの南原、葬儀社の奇人・雨部、いつまでも成仏しない幽霊・綾、刑事の安貴、謎の霊能者・緒月——個性豊かな面々に囲まれた、少し変わった奇妙な日常ミステリー。</p>
+          <span class="badge">第1話 破 星めぐりの歌</span>
+          <p style="font-size:var(--text-sm);">95歳で亡くなったシホ婆の依頼が来る。「亡夫の写真が何十年も世界を旅して戻ってくるが、今回だけ半年経っても戻ってこない」——捜索を頼まれた南原が奔走するが手がかりゼロ。するとテレビの宇宙中継に映った外国人飛行士が、その写真を持って民間衛星「ほしめぐり」に乗り込もうとしていた。シホの夫は飛行機乗り——宇宙に行くのが夢だったのだ。</p>
+        </div>
+        <!-- RIGHT: 主要キャラクター -->
+        <div style="display:flex;flex-direction:column;gap:var(--sp-sm);">
+          <h3>主要キャラクター</h3>
+          <table class="char-table">
+            <thead>
+              <tr><th>名前</th><th>役割・属性</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>井浦（いうら）</td><td>故人専門小説家。表情とぼしく目と口のみ。南原に対してだけ笑う</td></tr>
+              <tr><td>南原兼太（みなみはらけんた）</td><td>見習いアシスタント。振り回される常識人。よく転ぶ</td></tr>
+              <tr><td>雨部今生（あめぶいまき）</td><td>葬儀社「おくるびと」の奇才。毎回トンデモ新サービスを発明</td></tr>
+              <tr><td>雨部クロミ</td><td>雨部の相棒。無口だがスマホで的確に法律違反を突きつける</td></tr>
+              <tr><td>結城綾（ゆうきあや）</td><td>いつまでも成仏しない幽霊。事務所に居座りケーキを食べている</td></tr>
+              <tr><td>安貴京我（あききょうが）</td><td>刑事。デスクの引き出しに紅茶グッズしか入っていない</td></tr>
+              <tr><td>緒月（おつき）</td><td>月島の霊能者。毎回窓から飛び込んでくる</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== P4: キャラクターデザイン ===== -->
+  <section class="slide slide-content" style="--sp-xl:2.5rem;">
+    <div class="body">
+      <h2>キャラクターデザイン — あらためやむ</h2>
+      <div style="display:flex;flex-direction:column;gap:var(--sp-md);flex:1;">
+        <!-- Top row: 2 characters -->
+        <div class="cols-2" style="flex:1;gap:var(--sp-md);">
+          <!-- 井浦 -->
+          <div class="char-design-card">
+            <div class="char-design-imgs">
+              <div class="char-design-img" style="background:linear-gradient(155deg,#0c1a1e 0%,#1a3028 50%,#0a1520 100%);">
+                <img src="assets/iura-color.png" alt="井浦 カラー">
+                <span class="char-design-label">COLOR</span>
+              </div>
+              <div class="char-design-img" style="background:linear-gradient(155deg,#1e1a10 0%,#2a2415 50%,#1a1608 100%);">
+                <img src="assets/iura-line.png" alt="井浦 線画">
+                <span class="char-design-label">LINE ART</span>
+              </div>
+            </div>
+            <p style="font-size:.7rem;color:var(--color-muted);">故人専門小説家。青緑ツートーンヘア、ブラウンスーツ。180cm。表情とぼしく、南原に対してだけ笑う。</p>
+          </div>
+          <!-- 南原 -->
+          <div class="char-design-card">
+            <div class="char-design-imgs">
+              <div class="char-design-img" style="background:linear-gradient(155deg,#101c10 0%,#1a2a1a 50%,#0e1a0e 100%);">
+                <img src="assets/minamihara-color.png" alt="南原 カラー">
+                <span class="char-design-label">COLOR</span>
+              </div>
+              <div class="char-design-img" style="background:linear-gradient(155deg,#1a1a0e 0%,#2a2a18 50%,#181808 100%);">
+                <img src="assets/minamihara-line.png" alt="南原 線画">
+                <span class="char-design-label">LINE ART</span>
+              </div>
+            </div>
+            <p style="font-size:.7rem;color:var(--color-muted);">見習いアシスタント。ダークグリーン髪、グレーパーカー。173cm。振り回される常識人。よく転ぶ。</p>
+          </div>
+        </div>
+        <!-- Bottom row: 5 COMING SOON -->
+        <div style="display:flex;flex-direction:row;gap:.5rem;">
+          <div class="char-coming-soon" style="flex:1;min-height:60px;">
+            <span class="cs-name">雨部今生</span>
+            <span class="cs-label">CHARACTER COMING SOON</span>
+          </div>
+          <div class="char-coming-soon" style="flex:1;min-height:60px;">
+            <span class="cs-name">雨部クロミ</span>
+            <span class="cs-label">CHARACTER COMING SOON</span>
+          </div>
+          <div class="char-coming-soon" style="flex:1;min-height:60px;">
+            <span class="cs-name">結城綾</span>
+            <span class="cs-label">CHARACTER COMING SOON</span>
+          </div>
+          <div class="char-coming-soon" style="flex:1;min-height:60px;">
+            <span class="cs-name">安貴京我</span>
+            <span class="cs-label">CHARACTER COMING SOON</span>
+          </div>
+          <div class="char-coming-soon" style="flex:1;min-height:60px;">
+            <span class="cs-name">緒月</span>
+            <span class="cs-label">CHARACTER COMING SOON</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== P5: スタッフ紹介 ===== -->
+  <section class="slide slide-content" style="--sp-xl:2.5rem;">
+    <div class="body">
+      <h2>制作スタッフ</h2>
+      <div class="cols-2" style="flex:1;align-items:start;">
+        <!-- LEFT: 監督 -->
+        <div class="card card-gold">
+          <span class="badge" style="margin-bottom:var(--sp-xs);">監督</span>
+          <h3>髙橋 果子（たかはし かこ）</h3>
+          <p style="font-size:.72rem;color:var(--color-muted);">映像監督・脚本・撮影・編集 / 宮城県出身。東北芸術工科大学 歴史遺産学科卒。</p>
+          <div class="divider"></div>
+          <div style="display:flex;flex-direction:column;gap:.3rem;">
+            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">NHK Eテレ「グレーテルのかまど」Dir・フードコーディネート・編集（2022〜）</p>
+            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">NHK Eテレ「人と暮らしと、台所」Dir・取材・編集（2020〜）ナレーション：麻生久美子</p>
+            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">SONY「映画×ブラビア」プロモーション Dir</p>
+            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">自主映画「PENROSE」監督・脚本・編集（2023年11月）出演：蒼木陣、江口航 ほか</p>
+            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">MV「井澤巧麻 Pure as Ice」監督・撮影・編集</p>
+            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">「こどもちゃれんじぷち」ビデオコンテンツ 監督・助監督</p>
+            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">中国語講座ドラマ「＃ぷらどら」シリーズ 監督・脚本</p>
+          </div>
+          <p style="font-size:.65rem;color:var(--color-accent-3);">使用ツール：Premiere Pro / DaVinci Resolve / Photoshop / Illustrator</p>
+        </div>
+        <!-- RIGHT: キャラクターデザイン -->
+        <div class="card card-purple">
+          <span class="badge badge-purple" style="margin-bottom:var(--sp-xs);">キャラクターデザイン</span>
+          <h3>あらためやむ</h3>
+          <p style="font-size:.72rem;color:var(--color-muted);">元パイオニアLDC・ユニバーサル・アミューズソフト等にて映像プロデューサーを歴任。晩年、漫画家に転身。ウェブトゥーン中心に活動。</p>
+          <div class="divider"></div>
+          <p style="font-size:.7rem;color:var(--color-muted);">代表作：「もんすたっ！」「タマオのおたま」「ののちゃん」「RUN」「仔猫をもらってきた」ほか</p>
+          <p style="font-size:.65rem;"><a href="https://www.pixiv.net/users/779169" target="_blank" style="color:var(--color-accent-2);">Pixiv: pixiv.net/users/779169 ↗</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== P6: ベンチマーク ===== -->
+  <section class="slide slide-content">
+    <div class="body">
+      <p style="font-size:var(--text-lg);font-weight:700;color:var(--color-fg);line-height:1.4;margin-bottom:var(--sp-sm);">「実写映画から生まれたIPが、AIアニメとして新たな命を吹き込まれる。」</p>
+      <div class="cols-3" style="flex:1;">
+        <!-- ① PENROSE -->
+        <div class="card card-sepia">
+          <span class="badge badge-sepia" style="margin-bottom:var(--sp-xs);">監督作 / 原作IP</span>
+          <h3>PENROSE</h3>
+          <p style="font-size:var(--text-sm);">2023年／髙橋果子 監督・脚本。本企画の実写原作。「故人専門小説家」という世界観の起点。出演：蒼木陣・江口航ほか。</p>
+          <span style="font-size:.72rem;color:var(--color-accent-3);font-weight:600;margin-top:auto;display:block;">→ 本企画はこのIPのAIアニメ化。監督自身の物語を自らの手で動かす。</span>
+        </div>
+        <!-- ② ゾンビランドサガ -->
+        <div class="card card-purple">
+          <span class="badge badge-purple" style="margin-bottom:var(--sp-xs);">参照フォーマット</span>
+          <h3>ゾンビランドサガ</h3>
+          <p style="font-size:var(--text-sm);">2018〜／MAPPA。死者をアイドルに復活させる「死×コメディ」のジャンル開拓作。シーズン2まで続く人気シリーズ。</p>
+          <span style="font-size:.72rem;color:var(--color-accent-2);font-weight:600;margin-top:auto;display:block;">→ 「死者が普通にそこにいる日常」という本企画の世界観と共鳴するリファレンス</span>
+        </div>
+        <!-- ③ 銭天童 -->
+        <div class="card card-gold">
+          <span class="badge" style="margin-bottom:var(--sp-xs);">AIアニメ最前線</span>
+          <h3>銭天童</h3>
+          <p style="font-size:var(--text-sm);">中国発のAIアニメシリーズ。AIによるキャラクター表現とストーリーテリングの可能性を切り開いた作品として注目を集める。</p>
+          <span style="font-size:.72rem;color:var(--color-accent);font-weight:600;margin-top:auto;display:block;">→ AIアニメが「物語コンテンツ」として成立することを示す最前線の事例</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== P7: 相関図 ===== -->
+  <section class="slide slide-content">
+    <div class="body">
+      <h2>キャラクター相関図</h2>
+      <div style="flex:1;display:grid;grid-template-rows:1fr 1fr 1fr;grid-template-columns:1fr 1.8fr 1fr;gap:var(--sp-sm);align-items:center;">
+        <!-- Row 1: 外部キャラ -->
+        <div class="rel-node" style="border-top:2px solid var(--color-accent-4);">
+          <div class="rn-name">安貴京我</div>
+          <div class="rn-role">DETECTIVE</div>
+          <div class="rn-desc">紅茶マニア。実は頼りになる</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;">
+          <div class="rel-node" style="width:100%;text-align:center;border-top:2px solid rgba(196,150,59,.4);">
+            <div class="rn-name" style="font-size:.72rem;">遺族（各話）</div>
+            <div class="rn-desc">依頼→故人の状況調査→「フィクション」として物語化→ただ一人の読者へ</div>
+          </div>
+          <div style="color:var(--color-accent);font-size:.9rem;">↓</div>
+        </div>
+        <div class="rel-node" style="border-top:2px solid var(--color-accent-5);">
+          <div class="rn-name">緒月</div>
+          <div class="rn-role">SPIRIT MEDIUM</div>
+          <div class="rn-desc">毎回窓から飛び込んでくる。月島の"クロ"な人脈</div>
+        </div>
+
+        <!-- Row 2: Core -->
+        <div style="display:flex;flex-direction:column;gap:.4rem;">
+          <div class="rel-node" style="border-left:3px solid var(--color-accent);">
+            <div class="rn-name">南原兼太</div>
+            <div class="rn-role">ASSISTANT</div>
+            <div class="rn-desc">振り回される日常担当</div>
+          </div>
+          <div class="rel-node" style="border-left:3px solid var(--color-accent-5);">
+            <div class="rn-name">結城綾</div>
+            <div class="rn-role">GHOST</div>
+            <div class="rn-desc">成仏できない元依頼人の霊。ケーキを食べる</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;">
+          <div class="rel-node center">
+            <div class="rn-name" style="font-size:1rem;font-weight:900;">井浦</div>
+            <div class="rn-role" style="font-size:.58rem;">故人専門小説家</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.4rem;">
+          <div class="rel-node" style="border-left:3px solid var(--color-accent-3);">
+            <div class="rn-name">雨部今生</div>
+            <div class="rn-role">UNDERTAKER</div>
+            <div class="rn-desc">毎回トンデモ新サービスを発明</div>
+          </div>
+          <div class="rel-node" style="border-left:3px solid var(--color-accent-2);">
+            <div class="rn-name">雨部クロミ</div>
+            <div class="rn-role">SILENT PARTNER</div>
+            <div class="rn-desc">スマホで的確に法律違反を指摘</div>
+          </div>
+        </div>
+
+        <!-- Row 3: 依頼構造 -->
+        <div></div>
+        <div class="rel-node" style="background:rgba(196,150,59,.05);border:1px dashed rgba(196,150,59,.3);text-align:center;">
+          <div class="rn-name" style="font-size:.72rem;">各話の故人（死者）</div>
+          <div class="rn-desc">南原が調査 → 井浦が「優しい嘘」で物語化</div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== P8: ストーリー① ===== -->
+  <section class="slide slide-content" style="--sp-xl:2.5rem;">
+    <div class="body">
+      <h2>ストーリー全体構成 ① シリーズ設定〜第1話前半</h2>
+      <div class="ep-log">
+        <!-- LEFT -->
+        <div class="ep-col">
+          <div class="ep-section-title">シリーズ設定（毎話共通）</div>
+          <div class="ep-item"><span class="ep-num">#1</span><span>舞台設定｜東京・中野。葬儀社ビルに事務所を構える"故人専門小説家"井浦と見習い南原</span></div>
+          <div class="ep-item"><span class="ep-num">#2</span><span>仕事の仕組み｜遺族の依頼→故人の死の状況を調査→事実を「フィクション」の物語として執筆→ただ一人の読者（依頼人）に届ける</span></div>
+          <div class="ep-item"><span class="ep-num">#3</span><span>ペンローズの哲学｜二次元では成立するが三次元では不可能な図形。井浦の書く物語もそういう「優しい嘘」</span></div>
+          <div class="ep-item"><span class="ep-num">#4</span><span>住人たち｜葬儀社の雨部&クロミ、成仏しない幽霊・綾、刑事・安貴、霊能者・緒月</span></div>
+
+          <div class="ep-section-title" style="margin-top:.5rem;">第1話「破 星めぐりの歌」序盤</div>
+          <div class="ep-item"><span class="ep-num">#5</span><span>屋上の鼻唄｜葬儀社ビル屋上。原稿用紙に囲まれ仰向けになる井浦が「♪あかいめだまのさそり…」と宮沢賢治の星めぐりの歌を口ずさんでいる</span></div>
+          <div class="ep-item"><span class="ep-num">#6</span><span>南原に電話｜「写真を探してほしい」という依頼電話。「僕は何でも屋じゃなく小説家！」と言い張るも渋々引き受ける</span></div>
+          <div class="ep-item"><span class="ep-num">#7</span><span>コケる南原｜電話を切った南原、電話線が足に絡まって盛大にコケる</span></div>
+          <div class="ep-item"><span class="ep-num">#8</span><span>依頼の内容｜95歳で亡くなったシホ婆。亡夫の写真が何十年も世界を旅して戻ってくるを繰り返していたが、今回だけ半年経っても戻ってこない</span></div>
+        </div>
+        <!-- RIGHT -->
+        <div class="ep-col">
+          <div class="ep-section-title">中盤：調査と失敗</div>
+          <div class="ep-item"><span class="ep-num">#9</span><span>雨部のドローン葬｜「遺灰を乗せたソーラーパネル搭載ドローンで半永久の空の旅！ドローン葬じゃ〜！」と高笑い</span></div>
+          <div class="ep-item"><span class="ep-num">#10</span><span>法律違反の壁｜クロミが無言でスマホを差し出す。「航空法違反」「領空侵犯」「関税法違反」……次々とスワイプ</span></div>
+          <div class="ep-item"><span class="ep-num">#11</span><span>雨部の反論｜「俺は政府に極太パイプを持つ世界の雨部だぜ！人間の法律なんて俺の前では無力ゥ〜！」</span></div>
+          <div class="ep-item"><span class="ep-num">#12</span><span>警察に相談｜安貴のデスクへ。引き出しを開けると紅茶グッズしか入っていない。南原「暇じゃん」安貴「なんだ？」</span></div>
+          <div class="ep-item"><span class="ep-num">#13</span><span>海外は管轄外｜「海外での遺失物は警察の管轄じゃない。それくらい井浦に教われよ」</span></div>
+          <div class="ep-item"><span class="ep-num">#14</span><span>手がかりゼロ｜事務所に戻る南原「今回ばかりはマジで無理っす…」</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== P9: ストーリー② ===== -->
+  <section class="slide slide-content" style="--sp-xl:2.5rem;">
+    <div class="body">
+      <h2>ストーリー全体構成 ② 第1話後半〜エンド</h2>
+      <div class="ep-log">
+        <!-- LEFT -->
+        <div class="ep-col">
+          <div class="ep-section-title">後半：事件は動く</div>
+          <div class="ep-item"><span class="ep-num">#15</span><span>綾のケーキ｜仏壇の前でケーキを頬張る幽霊・綾。「はぁ〜ん♡最高〜♡」雨部が抱きしめようとして空振り</span></div>
+          <div class="ep-item"><span class="ep-num">#16</span><span>テレビの中継｜民間人工衛星「ほしめぐり」打ち上げ前の中継。外国人宇宙飛行士がカメラにセピア色の古い写真を見せている</span></div>
+          <div class="ep-item"><span class="ep-num">#17</span><span>緒月、窓から降臨｜「ハッ！」突然窓が開き緒月が飛び込んでくる。テーブルに仁王立ち。「井浦どこよ？シホ婆はうちの古参客だ」</span></div>
+          <div class="ep-item"><span class="ep-num">#18</span><span>霊力の秘密｜「シホ婆が旦那の夢を叶えたいって言うから写真に霊力を込めてやったんだ。だから写真は旅をしていた」</span></div>
+          <div class="ep-item"><span class="ep-num">#19</span><span>写真の発見｜テレビの宇宙飛行士が英語でインタビューに答えている。「半年前、突然この写真が落ちてきた。HAHAHA！」</span></div>
+          <div class="ep-item"><span class="ep-num">#20</span><span>南原爆発｜「は？は、は……？！写真が宇宙に持ってかれちゃいましたよぉ！！！」</span></div>
+        </div>
+        <!-- RIGHT -->
+        <div class="ep-col">
+          <div class="ep-section-title">クライマックス：屋上の真実</div>
+          <div class="ep-item"><span class="ep-num">#21</span><span>屋上の静寂｜血相を変えて駆け上がる南原。屋上には井浦一人。</span></div>
+          <div class="ep-item"><span class="ep-num">#22</span><span>シホの声（想像）｜「あの人は飛行機乗りだったからねぇ。宇宙にも飛んでいきたいと言ってたの」</span></div>
+          <div class="ep-item"><span class="ep-num">#23</span><span>夢の成就｜「もう戻らなくていいから、存分に行っといで……よかった、夢が叶って。いってらっしゃい」</span></div>
+          <div class="ep-item"><span class="ep-num">#24</span><span>井浦の正体｜手元の原稿用紙。タイトルには「星めぐりの歌」。書き上がっていた。</span></div>
+          <div class="ep-item"><span class="ep-num">#25</span><span>ニヤリ｜「南ちゃん、書き上がったよ。さ、依頼人を呼んで。」振り向いて笑う井浦。</span></div>
+
+          <div class="ep-section-title" style="margin-top:.5rem;">エンド</div>
+          <div class="ep-item"><span class="ep-num">#26</span><span>タイトル表示｜〈PENROSE 破 星めぐりの歌〉</span></div>
+
+          <div class="ep-section-title" style="margin-top:.5rem;">シリーズ今後</div>
+          <div class="ep-item"><span class="ep-num">#27</span><span>第2話以降｜毎話新しい"故人"の依頼が来る。依頼ごとに死の状況・遺族の関係・倫理的葛藤が異なる</span></div>
+          <div class="ep-item"><span class="ep-num">#28</span><span>キャラクター深掘り｜綾はなぜ成仏できないのか。緒月の過去。雨部のドローン葬は実現するのか。</span></div>
+          <div class="ep-item"><span class="ep-num">#29</span><span>井浦の謎｜なぜこの仕事を始めたのか。「優しい嘘」を書き続ける動機とは。</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== P10: シリーズ展開 ===== -->
+  <section class="slide slide-content">
+    <div class="body">
+      <h2>シリーズ展開の可能性</h2>
+      <p style="font-size:var(--text-lg);color:var(--color-muted);">1エピソード＝5〜7ショート（各1〜3分）で構成</p>
+      <div class="flow">
+        <div class="flow-step">
+          <h3>A パート</h3>
+          <p>日常の奇妙な依頼が来る。南原がオロオロする。</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <h3>B パート</h3>
+          <p>調査。サブキャラが絡んでくる。笑いのシーン。</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <h3>C パート</h3>
+          <p>事件が意外な展開を見せる。</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <h3>D パート</h3>
+          <p>井浦が「優しい嘘」の小説を書き上げる。感情的クライマックス。</p>
+        </div>
+      </div>
+      <div class="cols-3">
+        <div class="card card-gold">
+          <span class="tag">累積効果</span>
+          <h3>キャラクターへの愛着</h3>
+          <p>各話ゲスト故人と主要キャラの交差が積み重なり、感情移入が深まる</p>
+        </div>
+        <div class="card card-purple">
+          <span class="tag">拡散設計</span>
+          <h3>切り抜き前提の構成</h3>
+          <p>各パートが1〜3分の縦型ショートとして独立して成立。冒頭からオチまで完結</p>
+        </div>
+        <div class="card card-sepia">
+          <span class="tag">シリーズ展開</span>
+          <h3>伏線構造</h3>
+          <p>綾の成仏・緒月の過去・井浦の謎が各話に散りばめられ、シリーズとして回収される</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== P11: 切り抜き要素 ===== -->
+  <section class="slide slide-content">
+    <div class="body">
+      <h2>縦型で映えるキャラクター紹介シーン</h2>
+      <div class="cols-2" style="flex:1;">
+        <!-- Scene 01 -->
+        <div class="scene-card">
+          <span class="sc-num">SCENE 01</span>
+          <div class="sc-title">井浦の「ニヤリ」——無表情から一瞬の笑みへ</div>
+          <div class="sc-body">ずっと無表情で話していた井浦が、最後に振り返ってニヤリと笑う瞬間。南原にだけ向ける表情。このギャップが「推し」の発火点になる。</div>
+          <div class="sc-trigger">キャラクター推し文化との親和性◎。「はじめてニヤリが来た回」の切り抜きは高確率でバズる。</div>
+        </div>
+        <!-- Scene 02 -->
+        <div class="scene-card">
+          <span class="sc-num">SCENE 02</span>
+          <div class="sc-title">南原のリアクション三連発</div>
+          <div class="sc-body">①電話線が絡まってコケる ②「は？は、は……？！」写真が宇宙へ ③「井浦さぁん！！」血相を変えて屋上へ——リアクション芸の積み重ねがキャラクターの愛着を生む。</div>
+          <div class="sc-trigger">切り抜き・MAD素材としての拡散力大。「また南原がコケてる」というコメント欄文化が育つ。</div>
+        </div>
+        <!-- Scene 03 -->
+        <div class="scene-card">
+          <span class="sc-num">SCENE 03</span>
+          <div class="sc-title">クロミの無言スワイプ</div>
+          <div class="sc-body">雨部の高笑いをよそに、無言でスマホを差し出すクロミ。「航空法違反」「領空侵犯」「関税法違反」……スワイプし続ける。</div>
+          <div class="sc-trigger">無口キャラの「的確な一刺し」系。縦型ショートのテンポと完全一致。シリーズで繰り返すほど「今回も来た」感が加速。</div>
+        </div>
+        <!-- Scene 04 -->
+        <div class="scene-card">
+          <span class="sc-num">SCENE 04</span>
+          <div class="sc-title">緒月の窓ダイブ</div>
+          <div class="sc-body">毎回窓から飛び込んでくる。「ハッ！」テーブルに仁王立ち。「井浦どこよ？」——繰り返しギャグとしてシリーズを重ねるほど視聴者がツッコめる構造になる。</div>
+          <div class="sc-trigger">定番フォーマット化でシリーズ視聴の動機付けに。「今回の緒月は何階から」系コメントが育つ。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== P12: 映像サンプル ===== -->
+  <section class="slide slide-content">
+    <div class="body">
+      <h2>映像サンプル——AIアニメのクオリティと世界観</h2>
+      <div class="cols-3" style="flex:1;margin-block:0;">
+        <!-- Frame 1 -->
+        <div class="video-frame" style="background:linear-gradient(135deg,#0f0e1a 0%,#1a1228 50%,#0c1018 100%);">
+          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
+          <div class="vf-label">01 / V-1776239330277</div>
+        </div>
+        <!-- Frame 2 -->
+        <div class="video-frame" style="background:linear-gradient(155deg,#180e0a 0%,#241208 50%,#100c08 100%);">
+          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
+          <div class="vf-label">02 / V-1776239330277</div>
+        </div>
+        <!-- Frame 3 -->
+        <div class="video-frame" style="background:linear-gradient(155deg,#0a0f18 0%,#0c1822 50%,#080e14 100%);">
+          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
+          <div class="vf-label">03 / V-1776239330277</div>
+        </div>
+        <!-- Frame 4 -->
+        <div class="video-frame" style="background:linear-gradient(135deg,#141018 0%,#1c1428 50%,#100e18 100%);">
+          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
+          <div class="vf-label">04 / V-1776239350153</div>
+        </div>
+        <!-- Frame 5 -->
+        <div class="video-frame" style="background:linear-gradient(155deg,#0f1208 0%,#18200a 50%,#0c1008 100%);">
+          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
+          <div class="vf-label">05 / V-1776239350153</div>
+        </div>
+        <!-- Frame 6 -->
+        <div class="video-frame" style="background:linear-gradient(155deg,#100a10 0%,#1c1020 50%,#0e0810 100%);">
+          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
+          <div class="vf-label">06 / V-1776239350153</div>
+        </div>
+      </div>
+      <p style="font-size:var(--text-sm);color:var(--color-muted);">「AIアニメ特有の"奇妙な質感"と"不完全な動き"が、この世とあの世の境界を自然に演出する。」</p>
+    </div>
+  </section>
+
+  <!-- ===== P13: 制作体制 ===== -->
+  <section class="slide slide-content" style="--sp-xl:2.5rem;">
+    <div class="body">
+      <h2>制作体制</h2>
+      <div class="cols-2" style="flex:1;align-items:start;gap:var(--sp-xl);">
+        <!-- LEFT: production table -->
+        <table class="prod-table">
+          <tbody>
+            <tr><td>制作会社</td><td>株式会社Chammi</td></tr>
+            <tr><td>脚本原作</td><td>PENROSE（2023年）</td></tr>
+            <tr><td>監督</td><td>髙橋 果子</td></tr>
+            <tr><td>キャラクターデザイン</td><td>あらためやむ</td></tr>
+            <tr><td>プラットフォーム</td><td>縦型ショートプラットフォーム</td></tr>
+            <tr><td>制作期間</td><td>約1ヶ月</td></tr>
+          </tbody>
+        </table>
+        <!-- RIGHT: bio blocks -->
+        <div style="display:flex;flex-direction:column;gap:var(--sp-md);">
+          <div>
+            <p style="font-size:var(--text-xs);color:var(--color-accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;">監督略歴 / 髙橋 果子</p>
+            <p style="font-size:var(--text-sm);color:var(--color-muted);line-height:1.65;">宮城県出身。東北芸術工科大学 歴史遺産学科卒。NHK Eテレ「グレーテルのかまど」「人と暮らしと、台所」ディレクター。Sony「映画×ブラビア」プロモーション Dir。「こどもちゃれんじぷち」ビデオコンテンツ 監督。MV「井澤巧麻 Pure as Ice」監督・撮影・編集。自主映画「PENROSE」監督・脚本・編集（2023年11月公開）。</p>
+          </div>
+          <div>
+            <p style="font-size:var(--text-xs);color:var(--color-accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;">キャラクターデザイン / あらためやむ</p>
+            <p style="font-size:var(--text-sm);color:var(--color-muted);">パイオニアLDC・ユニバーサル・アミューズソフト等にて映像プロデューサーを歴任。現在はウェブトゥーンを中心に漫画家として活動。代表作：「もんすたっ！」「タマオのおたま」「ののちゃん」「RUN」「仔猫をもらってきた」ほか</p>
+            <p style="font-size:var(--text-xs);"><a href="https://www.pixiv.net/users/779169" target="_blank" style="color:var(--color-accent-2);">Pixiv: pixiv.net/users/779169 ↗</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /.deck -->
+
+<!-- ── ナビUI ── -->
+<div class="slide-ui">
+  <div class="slide-counter">01 / 13</div>
+  <div class="slide-nav">
+    <button id="btn-prev">← Prev</button>
+    <button id="btn-next">Next →</button>
+    <button id="btn-pdf" title="PDF書き出し">PDF</button>
+    <button id="btn-fs" title="フルスクリーン (F)">⛶</button>
+  </div>
+</div>
+<script src="../../engine/slide.js"></script>
+</body>
+</html>

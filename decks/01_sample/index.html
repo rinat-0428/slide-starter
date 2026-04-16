@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>サンプルデッキ — Slide Starter</title>
+  <link rel="stylesheet" href="../../engine/slide.css">
+  <link rel="stylesheet" href="../../theme/sample.css">
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ===== 01: タイトルスライド ===== -->
+  <section class="slide slide-title is-active">
+    <p class="label">Your Tagline Here.</p>
+    <h1>ここにメインタイトルを<br>入れてください</h1>
+    <p class="sub">サブタイトル・発表の概要を1〜2行で。<br>余白が伝える力を持つ。</p>
+    <p class="muted" style="font-size: var(--text-sm); margin-top: auto;">2026.04 &nbsp;/&nbsp; あなたの名前</p>
+  </section>
+
+  <!-- ===== 02: コンテンツ（シンプル） ===== -->
+  <section class="slide slide-content">
+
+    <div class="body">
+      <h2>セクションタイトル</h2>
+      <p>本文テキスト。1スライドに1メッセージ。<br>
+         余白を活かして、情報を詰め込みすぎない。</p>
+      <p>2段落目の本文。補足情報はここに。<br>
+         <span class="accent bold">強調したいキーワード</span>はこのようにマークする。</p>
+    </div>
+  </section>
+
+  <!-- ===== 03: コンテンツ（箇条書き） ===== -->
+  <section class="slide slide-content">
+
+    <div class="body">
+      <h2>3つのポイント</h2>
+      <ul class="list">
+        <li>最初のポイント。<span class="accent bold">強調したい語句</span>はこう書く。</li>
+        <li>2番目のポイント。簡潔に、1〜2行で収める。</li>
+        <li>3番目のポイント。箇条書きは最大5項目まで。<span class="muted">（補足情報はこの色で）</span></li>
+        <li>4番目のポイント。<span class="accent-2 bold">問題点</span>はピンクで、<span class="accent-4 bold">解決策</span>はグリーンで色分けできる。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== 04: コンテンツ（2カラム比較） ===== -->
+  <section class="slide slide-content">
+
+    <div class="body">
+      <h2>比較・対比</h2>
+      <div class="cols-2">
+        <div class="card card-pink">
+          <span class="badge badge-pink" style="margin-bottom: var(--sp-xs);">Before</span>
+          <h3>従来のやり方</h3>
+          <p>問題点や課題をここに書く。<br>手作業・非効率・高コスト。</p>
+        </div>
+        <div class="card card-green">
+          <span class="badge badge-green" style="margin-bottom: var(--sp-xs);">After</span>
+          <h3>新しいアプローチ</h3>
+          <p>改善点やメリットをここに書く。<br>自動化・高速・低コスト。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 05: 図解：フローチャート ===== -->
+  <section class="slide slide-content">
+
+    <div class="body">
+      <h2>プロセスの流れ</h2>
+      <div class="flow">
+        <div class="flow-step">
+          <h3>収集</h3>
+          <p>データを集める</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <h3>分析</h3>
+          <p>パターンを見つける</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <h3>実行</h3>
+          <p>施策に落とす</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <h3>検証</h3>
+          <p>効果を測定する</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 06: 図解：フェーズカード（上線カラー） ===== -->
+  <section class="slide slide-content">
+
+    <div class="body">
+      <h2>ロードマップ</h2>
+      <div class="cols-3">
+        <div class="card card-green">
+          <span class="badge badge-green" style="margin-bottom: var(--sp-xs);">Phase 1</span>
+          <h3>基盤構築・実証</h3>
+          <p>MVPの開発と初期ユーザーへの提供。<br>仮説検証を最速で回す。</p>
+        </div>
+        <div class="card card-yellow">
+          <span class="badge badge-yellow" style="margin-bottom: var(--sp-xs);">Phase 2</span>
+          <h3>スケール・収益化</h3>
+          <p>顧客基盤の拡大と<br>マネタイズモデルの確立。</p>
+        </div>
+        <div class="card card-purple">
+          <span class="badge badge-purple" style="margin-bottom: var(--sp-xs);">Phase 3</span>
+          <h3>事業拡大</h3>
+          <p>海外展開・パートナー連携・<br>プロダクト多角化。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 07: 図解：KPI / 数字ハイライト ===== -->
+  <section class="slide slide-content">
+
+    <div class="body">
+      <h2>主要指標</h2>
+      <div class="cols-3" style="align-items: center; flex: 1;">
+        <div class="stat">
+          <span class="number">3.2x</span>
+          <span class="label">生産性向上</span>
+        </div>
+        <div class="stat">
+          <span class="number">47%</span>
+          <span class="label">コスト削減</span>
+        </div>
+        <div class="stat">
+          <span class="number">120+</span>
+          <span class="label">導入企業数</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 08: 図解：3カラムカード（タグ番号） ===== -->
+  <section class="slide slide-content">
+
+    <div class="body">
+      <h2>3つの柱</h2>
+      <div class="cols-3">
+        <div class="card">
+          <span class="tag">01</span>
+          <h3>戦略設計</h3>
+          <p>ゴールから逆算して<br>打ち手を構造化する。</p>
+        </div>
+        <div class="card">
+          <span class="tag">02</span>
+          <h3>高速実装</h3>
+          <p>仮説を最速で形にし<br>市場からFBを得る。</p>
+        </div>
+        <div class="card">
+          <span class="tag">03</span>
+          <h3>継続改善</h3>
+          <p>データに基づいて<br>サイクルを回し続ける。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 09: テキスト+画像（横並び） ===== -->
+  <section class="slide slide-content">
+
+    <div class="body">
+      <h2>テキストと画像の組み合わせ</h2>
+      <div class="text-img">
+        <div class="text">
+          <p>左にテキスト、右に画像を配置する<br>レイアウト。</p>
+          <p>プロダクトのスクリーンショットや<br>概念図を添えるのに最適。</p>
+          <ul class="list" style="margin-top: var(--sp-xs);">
+            <li>ポイント1：<span class="accent bold">視覚的な補足</span></li>
+            <li>ポイント2：読み取りやすい構造</li>
+          </ul>
+        </div>
+        <div class="img-box">
+          <img src="assets/image-box.png" alt="サンプル画像">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 10: ステートメント（橋渡し・核心） ===== -->
+  <section class="slide slide-statement">
+    <p class="kicker">課題</p>
+    <h2>動画は作れても、<br>
+      <span class="highlight-pink">IPにならない</span></h2>
+    <p>作家性・継続性・視聴者データ——<br>これを統合する機能が欠けていた。</p>
+  </section>
+
+  <!-- ===== 11: セクション区切り ===== -->
+  <section class="slide slide-section">
+    <h2><span class="accent">Part 2</span></h2>
+    <p>セクションの区切りに使う。<br>章立てのあるプレゼンに最適。</p>
+  </section>
+
+  <!-- ===== 12: ランディング（左線バー） ===== -->
+  <section class="slide slide-landing">
+
+    <h2>ここに最も伝えたい<br>
+      <span class="accent">核心の一文</span>を置く。<br>
+      <span class="muted" style="font-size: var(--text-2xl);">印象的な比喩・確信・結論に使う。</span></h2>
+  </section>
+
+  <!-- ===== 13: エンディングスライド ===== -->
+  <section class="slide slide-end">
+
+    <div class="mark"></div>
+    <h2>ありがとうございました</h2>
+    <p class="muted">お名前 &nbsp;/&nbsp; 肩書き・所属</p>
+    <p class="muted" style="font-size: var(--text-sm);">contact@example.com</p>
+  </section>
+
+</div><!-- /.deck -->
+
+<!-- ── ナビUI ── -->
+<div class="slide-ui">
+  <div class="slide-counter">01 / 13</div>
+  <div class="slide-nav">
+    <button id="btn-prev">← Prev</button>
+    <button id="btn-next">Next →</button>
+    <button id="btn-pdf" title="PDF書き出し">PDF</button>
+    <button id="btn-fs" title="フルスクリーン (F)">⛶</button>
+  </div>
+</div>
+
+<script src="../../engine/slide.js"></script>
+</body>
+</html>

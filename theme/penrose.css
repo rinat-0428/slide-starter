@@ -1,0 +1,449 @@
+/* ============================================================
+   theme/penrose.css — ノワール・ゴールドテーマ（PENROSE 破 星めぐりの歌）
+   ここだけ変更してデザインをカスタマイズする
+   ============================================================ */
+
+:root {
+  /* ── カラー ── */
+  --color-chrome:  #0d0c18;             /* ブラウザ背景（ナビUIの視認性を保つためダーク） */
+  --color-bg:      #f7f3eb;             /* スライド背景（ウォームパーチメント） */
+  --color-fg:      #1c1a28;             /* テキスト（ディープインク） */
+  --color-muted:   rgba(28,26,40,.5);   /* テキスト（サブ・補足） */
+
+  /* マルチカラーアクセント */
+  --color-accent:   #c4963b;            /* ダスティゴールド：プライマリ */
+  --color-accent-2: #7054b8;            /* ミューテッドパープル：課題・問題提起 */
+  --color-accent-3: #8b6847;            /* セピア：強調・ハイライト */
+  --color-accent-4: #4a7a9b;            /* スティールブルー：解決・フェーズ */
+  --color-accent-5: #c85f8a;            /* ダスティローズ：将来・拡張 */
+
+  --color-border:   rgba(28,26,40,.1);
+  --color-num:      rgba(28,26,40,.15); /* スライド番号 */
+  --color-card-bg:  rgba(28,26,40,.03);
+
+  /* ── グラデーション ── */
+  /* ダークノワール（表紙・ステートメント・エンディング用） */
+  --gradient-noir:
+    radial-gradient(ellipse 65% 75% at 20% 30%, rgba(196,150,59,.28) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 65% at 82% 65%, rgba(112,84,184,.2) 0%, transparent 58%),
+    radial-gradient(ellipse 45% 55% at 50% 95%, rgba(60,30,10,.5) 0%, transparent 50%),
+    #0f0e1a;
+
+  /* ウォームパステル（コンテンツ系背景） */
+  --gradient-pastel:
+    radial-gradient(ellipse 70% 90% at 15% 50%, rgba(196,150,59,.1) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 85% 25%, rgba(112,84,184,.08) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 70% at 55% 88%, rgba(139,104,71,.07) 0%, transparent 60%),
+    var(--color-bg);
+
+  /* ── タイポグラフィ ── */
+  --font-sans:  "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+  --font-serif: Georgia, "Palatino Linotype", serif;
+  --font-mono:  "SF Mono", "Fira Code", "Consolas", monospace;
+
+  --text-xs:   .75rem;    /* 12px */
+  --text-sm:   .875rem;   /* 14px */
+  --text-base: 1.125rem;  /* 18px */
+  --text-lg:   1.25rem;   /* 20px */
+  --text-xl:   1.75rem;   /* 28px */
+  --text-2xl:  2.5rem;    /* 40px */
+  --text-3xl:  3.5rem;    /* 56px */
+  --text-4xl:  5rem;      /* 80px */
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-bold:   700;
+
+  /* ── スペーシング ── */
+  --sp-xs:  .5rem;
+  --sp-sm:  1rem;
+  --sp-md:  1.5rem;
+  --sp-lg:  2.5rem;
+  --sp-xl:  4rem;
+
+  /* ── その他 ── */
+  --radius: 8px;
+  --border: 1px solid var(--color-border);
+}
+
+
+/* ── ベースタイポグラフィ ── */
+body { font-family: var(--font-sans); }
+
+.slide h1 {
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  color: var(--color-fg);
+}
+.slide h2 {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  letter-spacing: -.015em;
+  color: var(--color-fg);
+}
+.slide h3 {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  line-height: 1.3;
+  color: var(--color-fg);
+}
+.slide p {
+  font-size: var(--text-lg);
+  line-height: 1.75;
+  color: var(--color-muted);
+}
+
+
+/* ============================================================
+   スライドタイプ（index.html の class で指定する）
+   ============================================================ */
+
+/* ① title — タイトルスライド（ダークノワール） */
+.slide-title {
+  background: var(--gradient-noir);
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--sp-md);
+}
+.slide-title .label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: .06em;
+  background: rgba(196,150,59,.15);
+  color: #c4963b;
+  padding: .3em .8em;
+  border-radius: 4px;
+  display: inline-block;
+}
+.slide-title h1 {
+  max-width: 880px;
+  color: #f0ebe0;
+  font-family: var(--font-serif);
+  letter-spacing: .06em;
+}
+.slide-title .sub {
+  font-size: var(--text-lg);
+  color: rgba(240,235,224,.6);
+  max-width: 640px;
+  line-height: 1.65;
+}
+
+/* ② content — 汎用コンテンツスライド */
+.slide-content { gap: var(--sp-lg); }
+.slide-content .body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+  flex: 1;
+}
+/* コンテンツスライドの h2 にドット prefix を自動付与 */
+.slide-content .body > h2 {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+}
+.slide-content .body > h2::before {
+  content: '';
+  display: inline-block;
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+/* ③ statement — ステートメント・橋渡しスライド（ダークノワール） */
+.slide-statement {
+  background: var(--gradient-noir);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-md);
+}
+.slide-statement h2 {
+  font-size: var(--text-3xl);
+  max-width: 920px;
+  line-height: 1.35;
+  color: #f0ebe0;
+}
+.slide-statement .kicker {
+  font-size: var(--text-sm);
+  color: rgba(196,150,59,.65);
+  font-family: var(--font-serif);
+  letter-spacing: .1em;
+}
+
+/* ④ landing — 左線バー強調スライド */
+.slide-landing {
+  justify-content: center;
+  align-items: flex-start;
+  border-left: 4px solid var(--color-accent);
+  padding-left: calc(var(--sp-xl) - 4px);
+}
+.slide-landing h2 {
+  font-size: var(--text-3xl);
+  max-width: 900px;
+  line-height: 1.3;
+}
+
+/* ⑤ section — セクション区切り */
+.slide-section {
+  justify-content: center;
+  gap: var(--sp-sm);
+}
+.slide-section h2 {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+}
+.slide-section p {
+  font-size: var(--text-lg);
+  color: var(--color-muted);
+  max-width: 640px;
+}
+.slide-section .sec-num {
+  font-size: var(--text-sm);
+  font-family: var(--font-serif);
+  color: var(--color-accent);
+  letter-spacing: .12em;
+  display: block;
+  margin-bottom: .3rem;
+}
+
+/* ⑥ end — エンディング（ダークノワール） */
+.slide-end {
+  background: var(--gradient-noir);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-md);
+}
+.slide-end h2 {
+  color: #f0ebe0;
+}
+.slide-end .mark {
+  width: 40px;
+  height: 2px;
+  background: var(--color-accent);
+  margin: 0 auto;
+}
+
+
+/* ============================================================
+   ユーティリティクラス
+   ============================================================ */
+
+/* テキストカラー */
+.accent   { color: var(--color-accent); }
+.accent-2 { color: var(--color-accent-2); }
+.accent-3 { color: var(--color-accent-3); }
+.accent-4 { color: var(--color-accent-4); }
+.accent-5 { color: var(--color-accent-5); }
+.muted    { color: var(--color-muted); }
+.mono     { font-family: var(--font-mono); }
+.bold     { font-weight: var(--weight-bold); }
+.serif    { font-family: var(--font-serif); }
+
+/* 区切り線 */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* グリッドレイアウト */
+.cols-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-lg);
+}
+.cols-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--sp-lg);
+  margin-block: auto;
+}
+.cols-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: var(--sp-md);
+}
+
+/* 箇条書き（行頭にアクセント色の円） */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  list-style: none;
+}
+.list li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-sm);
+  font-size: var(--text-lg);
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+.list li::before {
+  content: '';
+  display: inline-block;
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  margin-top: .55em;
+}
+
+/* ── カード ── */
+.card {
+  background: var(--color-card-bg);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: var(--sp-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+}
+.card h3 { font-size: var(--text-lg); }
+.card p  { font-size: var(--text-base); }
+
+/* カード上線カラーバリアント */
+.card-gold   { border-top: 3px solid var(--color-accent);   background: rgba(196,150,59,.04); }
+.card-purple { border-top: 3px solid var(--color-accent-2); background: rgba(112,84,184,.04); }
+.card-sepia  { border-top: 3px solid var(--color-accent-3); background: rgba(139,104,71,.04); }
+.card-blue   { border-top: 3px solid var(--color-accent-4); background: rgba(74,122,155,.04); }
+.card-rose   { border-top: 3px solid var(--color-accent-5); background: rgba(200,95,138,.04); }
+/* 互換性のため sample.css のカラーも保持 */
+.card-pink   { border-top: 3px solid var(--color-accent-5); background: rgba(200,95,138,.04); }
+.card-green  { border-top: 3px solid var(--color-accent-4); background: rgba(74,122,155,.04); }
+
+/* ── バッジ（ピルラベル） ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: .2rem .75rem;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  background: rgba(196,150,59,.12);
+  color: var(--color-accent);
+  letter-spacing: .03em;
+}
+.badge-purple { background: rgba(112,84,184,.12);  color: #7054b8; }
+.badge-sepia  { background: rgba(139,104,71,.12);   color: #8b6847; }
+.badge-blue   { background: rgba(74,122,155,.12);   color: #4a7a9b; }
+.badge-rose   { background: rgba(200,95,138,.12);   color: #c85f8a; }
+/* 互換性のため sample.css のバッジも保持 */
+.badge-pink   { background: rgba(200,95,138,.12);   color: #c85f8a; }
+.badge-yellow { background: rgba(139,104,71,.12);   color: #8b6847; }
+.badge-green  { background: rgba(74,122,155,.12);   color: #4a7a9b; }
+
+/* ── ハイライト（インラインキーワードマーキング） ── */
+.highlight {
+  display: inline;
+  background: rgba(196,150,59,.12);
+  color: var(--color-accent);
+  padding: .1em .4em;
+  border-radius: 4px;
+  font-weight: var(--weight-medium);
+}
+.highlight-purple { background: rgba(112,84,184,.12); color: #7054b8; }
+.highlight-sepia  { background: rgba(139,104,71,.12);  color: #8b6847; }
+/* 互換性のため sample.css のハイライトも保持 */
+.highlight-pink   { background: rgba(200,95,138,.12);  color: #c85f8a; }
+.highlight-yellow { background: rgba(139,104,71,.12);   color: #8b6847; }
+.highlight-green  { background: rgba(74,122,155,.12);   color: #4a7a9b; }
+
+/* ── フローチャート ── */
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+}
+.flow-step {
+  flex: 1;
+  text-align: center;
+  padding: var(--sp-md);
+  background: var(--color-card-bg);
+  border: var(--border);
+  border-radius: var(--radius);
+}
+.flow-step h3 { font-size: var(--text-lg); margin-bottom: var(--sp-xs); }
+.flow-step p  { font-size: var(--text-base); color: var(--color-muted); }
+.flow-arrow {
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+  font-size: var(--text-xl);
+  color: var(--color-accent);
+}
+
+/* ── 数字ハイライト（KPIなど） ── */
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-xs);
+}
+.stat .number {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+.stat .label {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* ── ロゴ（デフォルト: 左上） ── */
+.slide-logo {
+  position: absolute;
+  top: var(--sp-xl);
+  left: var(--sp-xl);
+  height: 20px;
+  opacity: .35;
+  pointer-events: none;
+}
+
+/* ── 画像ボックス ── */
+.img-box {
+  border-radius: var(--radius);
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+.img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* テキスト+画像の横並び */
+.text-img {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-lg);
+  flex: 1;
+  align-items: center;
+}
+.text-img .text { display: flex; flex-direction: column; gap: var(--sp-sm); }
+
+/* ── タグ ── */
+.tag {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: 2px;
+  padding: .15rem .5rem;
+  letter-spacing: .05em;
+}
