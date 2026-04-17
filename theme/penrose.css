@@ -6,20 +6,20 @@
 :root {
   /* ── カラー ── */
   --color-chrome:  #0d0c18;             /* ブラウザ背景（ナビUIの視認性を保つためダーク） */
-  --color-bg:      #f7f3eb;             /* スライド背景（ウォームパーチメント） */
-  --color-fg:      #1c1a28;             /* テキスト（ディープインク） */
-  --color-muted:   rgba(28,26,40,.5);   /* テキスト（サブ・補足） */
+  --color-bg:      #F7F4EF;             /* スライド背景（オフホワイト） */
+  --color-fg:      #2A2A2A;             /* テキスト（ダーク） */
+  --color-muted:   rgba(42,42,42,.55);  /* テキスト（サブ・補足） */
 
   /* マルチカラーアクセント */
-  --color-accent:   #c4963b;            /* ダスティゴールド：プライマリ */
-  --color-accent-2: #7054b8;            /* ミューテッドパープル：課題・問題提起 */
+  --color-accent:   #B8960C;            /* ゴールド：プライマリ */
+  --color-accent-2: #6B5B8F;            /* パープル：課題・問題提起 */
   --color-accent-3: #8b6847;            /* セピア：強調・ハイライト */
   --color-accent-4: #4a7a9b;            /* スティールブルー：解決・フェーズ */
   --color-accent-5: #c85f8a;            /* ダスティローズ：将来・拡張 */
 
   --color-border:   rgba(28,26,40,.1);
   --color-num:      rgba(28,26,40,.15); /* スライド番号 */
-  --color-card-bg:  rgba(28,26,40,.03);
+  --color-card-bg:  #EDEDEA;
 
   /* ── グラデーション ── */
   /* ダークノワール（表紙・ステートメント・エンディング用） */
@@ -78,10 +78,10 @@ body { font-family: var(--font-sans); }
   color: var(--color-fg);
 }
 .slide h2 {
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
   font-weight: var(--weight-bold);
-  line-height: 1.2;
-  letter-spacing: -.015em;
+  line-height: 1.4;
+  letter-spacing: -.01em;
   color: var(--color-fg);
 }
 .slide h3 {
@@ -91,8 +91,8 @@ body { font-family: var(--font-sans); }
   color: var(--color-fg);
 }
 .slide p {
-  font-size: var(--text-lg);
-  line-height: 1.75;
+  font-size: var(--text-sm);
+  line-height: 1.7;
   color: var(--color-muted);
 }
 
@@ -132,7 +132,7 @@ body { font-family: var(--font-sans); }
 }
 
 /* ② content — 汎用コンテンツスライド */
-.slide-content { gap: var(--sp-lg); }
+.slide-content { gap: var(--sp-md); padding: 40px 48px; }
 .slide-content .body {
   display: flex;
   flex-direction: column;
@@ -143,16 +143,19 @@ body { font-family: var(--font-sans); }
 .slide-content .body > h2 {
   display: flex;
   align-items: center;
-  gap: .65rem;
+  gap: .5rem;
+  padding-bottom: .4rem;
+  border-bottom: 1px solid #B8960C;
 }
 .slide-content .body > h2::before {
   content: '';
   display: inline-block;
   flex-shrink: 0;
-  width: 13px;
-  height: 13px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--color-accent);
+  background: #B8960C;
+  margin-right: -2px;
 }
 
 /* ③ statement — ステートメント・橋渡しスライド（ダークノワール） */
@@ -282,9 +285,9 @@ body { font-family: var(--font-sans); }
   display: flex;
   align-items: baseline;
   gap: var(--sp-sm);
-  font-size: var(--text-lg);
+  font-size: var(--text-sm);
   color: var(--color-muted);
-  line-height: 1.65;
+  line-height: 1.8;
 }
 .list li::before {
   content: '';
@@ -307,15 +310,15 @@ body { font-family: var(--font-sans); }
   flex-direction: column;
   gap: var(--sp-xs);
 }
-.card h3 { font-size: var(--text-lg); }
-.card p  { font-size: var(--text-base); }
+.card h3 { font-size: var(--text-base); line-height: 1.4; }
+.card p  { font-size: var(--text-sm); line-height: 1.7; }
 
 /* カード上線カラーバリアント */
-.card-gold   { border-top: 3px solid var(--color-accent);   background: rgba(196,150,59,.04); }
-.card-purple { border-top: 3px solid var(--color-accent-2); background: rgba(112,84,184,.04); }
-.card-sepia  { border-top: 3px solid var(--color-accent-3); background: rgba(139,104,71,.04); }
-.card-blue   { border-top: 3px solid var(--color-accent-4); background: rgba(74,122,155,.04); }
-.card-rose   { border-top: 3px solid var(--color-accent-5); background: rgba(200,95,138,.04); }
+.card-gold   { border-top: 3px solid #B8960C; background: #EDEDEA; }
+.card-purple { border-top: 3px solid #6B5B8F; background: #EDEDEA; }
+.card-sepia  { border-top: 3px solid var(--color-accent-3); background: #EDEDEA; }
+.card-blue   { border-top: 3px solid var(--color-accent-4); background: #EDEDEA; }
+.card-rose   { border-top: 3px solid var(--color-accent-5); background: #EDEDEA; }
 /* 互換性のため sample.css のカラーも保持 */
 .card-pink   { border-top: 3px solid var(--color-accent-5); background: rgba(200,95,138,.04); }
 .card-green  { border-top: 3px solid var(--color-accent-4); background: rgba(74,122,155,.04); }

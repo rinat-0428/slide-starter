@@ -3,60 +3,499 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PENROSE 破 星めぐりの歌 — 企画書</title>
+  <title>PENROSE — 故人専門小説家 — 企画書</title>
   <link rel="stylesheet" href="../../engine/slide.css">
   <link rel="stylesheet" href="../../theme/penrose.css">
   <style>
-    /* character/story tables */
-    .char-table { width: 100%; border-collapse: collapse; }
-    .char-table th { font-size: var(--text-sm); font-weight: 700; color: var(--color-accent); text-align: left; padding: .4rem .6rem; border-bottom: 2px solid rgba(196,150,59,.25); letter-spacing: .06em; }
-    .char-table td { font-size: var(--text-sm); color: var(--color-muted); padding: .4rem .6rem; border-bottom: 1px solid var(--color-border); vertical-align: top; line-height: 1.55; }
-    .char-table td:first-child { font-weight: 700; color: var(--color-fg); white-space: nowrap; min-width: 8rem; }
-    .char-table tbody tr:hover td { background: rgba(196,150,59,.03); }
 
-    /* episode log (P8, P9, P10) */
-    .ep-log { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-md); flex: 1; overflow: hidden; }
-    .ep-col { display: flex; flex-direction: column; gap: .32rem; }
-    .ep-section-title { font-size: .68rem; font-weight: 700; color: var(--color-accent); letter-spacing: .1em; text-transform: uppercase; padding: .18rem 0; border-bottom: 1px solid rgba(196,150,59,.2); margin-bottom: .12rem; font-family: Georgia, serif; }
-    .ep-item { font-size: .74rem; color: var(--color-muted); line-height: 1.48; display: flex; gap: .45rem; }
-    .ep-num { color: var(--color-accent); font-family: Georgia, serif; font-size: .68rem; font-weight: 700; flex-shrink: 0; min-width: 2rem; }
+    /* ── P1: 縦書きキャッチコピー ── */
+    .catch-vertical {
+      writing-mode: vertical-rl;
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      color: #f0ebe0;
+      letter-spacing: .18em;
+      line-height: 2.2;
+      text-shadow: 0 0 24px rgba(196,150,59,.25);
+    }
 
-    /* character design card */
-    .char-design-card { display: flex; flex-direction: column; gap: .5rem; }
-    .char-design-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; flex: 1; min-height: 0; }
-    .char-design-img { border-radius: 6px; overflow: hidden; background: rgba(28,26,40,.05); position: relative; display: flex; align-items: center; justify-content: center; min-height: 180px; }
-    .char-design-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .char-design-img .placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; width: 100%; height: 100%; padding: 1rem; }
-    .char-design-label { font-size: .62rem; color: var(--color-accent); letter-spacing: .1em; font-family: Georgia, serif; text-transform: uppercase; position: absolute; bottom: 6px; left: 8px; }
-    .char-coming-soon { display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(28,26,40,.025); border: 1px dashed rgba(28,26,40,.15); border-radius: 6px; gap: .35rem; padding: .6rem; }
-    .char-coming-soon .cs-name { font-size: .72rem; font-weight: 700; color: var(--color-fg); }
-    .char-coming-soon .cs-label { font-size: .58rem; color: rgba(28,26,40,.3); letter-spacing: .12em; font-family: Georgia, serif; }
+    /* ── P3: ジャンル表示 ── */
+    .genre-bar {
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--color-fg);
+      letter-spacing: .12em;
+      line-height: 1.2;
+    }
+    .genre-bar .x-mark {
+      color: var(--color-accent);
+      font-weight: 400;
+      margin: 0 .2em;
+    }
 
-    /* relationship diagram */
-    .rel-diagram { flex: 1; display: grid; grid-template-columns: 1fr 2fr 1fr; grid-template-rows: 1fr auto 1fr; gap: var(--sp-sm); align-items: center; }
-    .rel-node { background: var(--color-card-bg); border: var(--border); border-radius: var(--radius); padding: .5rem .7rem; text-align: center; }
-    .rel-node.center { background: rgba(196,150,59,.08); border-color: rgba(196,150,59,.35); border-radius: 50%; width: 120px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: auto; }
-    .rel-node .rn-name { font-size: .82rem; font-weight: 800; color: var(--color-fg); }
-    .rel-node .rn-role { font-size: .6rem; color: var(--color-accent); letter-spacing: .06em; }
-    .rel-node .rn-desc { font-size: .58rem; color: var(--color-muted); line-height: 1.4; margin-top: .25rem; }
-    .rel-arrow { font-size: .75rem; color: var(--color-accent); text-align: center; }
+    /* ── P3 / P4: 本文テキスト小 ── */
+    .body-text-sm {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+      line-height: 1.8;
+    }
+    .concept-block {
+      border-left: 3px solid var(--color-accent);
+      padding-left: var(--sp-sm);
+      font-size: var(--text-sm);
+      color: var(--color-fg);
+      font-weight: 700;
+      line-height: 1.6;
+    }
 
-    /* scene cards (P11) */
-    .scene-card { background: rgba(28,26,40,.03); border: 1px solid rgba(28,26,40,.1); border-left: 3px solid var(--color-accent); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--sp-sm) var(--sp-md); display: flex; flex-direction: column; gap: .4rem; flex: 1; }
-    .scene-card .sc-num { font-size: .62rem; color: var(--color-accent); letter-spacing: .1em; font-family: Georgia, serif; }
-    .scene-card .sc-title { font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--color-fg); line-height: 1.3; }
-    .scene-card .sc-body { font-size: var(--text-sm); color: var(--color-muted); line-height: 1.62; flex: 1; }
-    .scene-card .sc-trigger { font-size: .7rem; font-weight: 500; color: var(--color-accent-3); letter-spacing: .03em; border-top: 1px solid rgba(196,150,59,.15); padding-top: .3rem; margin-top: .2rem; }
+    /* ── P4: あらすじ導入行 ── */
+    .synopsis-opener {
+      font-family: var(--font-serif);
+      font-size: var(--text-base);
+      color: var(--color-fg);
+      letter-spacing: .06em;
+      margin-bottom: .35rem;
+    }
+    .synopsis-rule {
+      color: var(--color-accent);
+      margin-right: .5em;
+      letter-spacing: .05em;
+    }
 
-    /* video frame placeholders (P12) */
-    .video-frame { border-radius: 6px; overflow: hidden; background: #0f0e1a; position: relative; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; }
-    .video-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .video-frame .vf-label { position: absolute; bottom: 6px; left: 8px; font-size: .58rem; color: rgba(196,150,59,.6); font-family: Georgia, serif; letter-spacing: .08em; }
+    /* ── P6: スタッフレイアウト ── */
+    .staff-layout { display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--sp-md); flex:1; align-items:start; min-height:0; }
+    .staff-section { display:flex; flex-direction:column; gap:.3rem; }
+    .staff-role-label { font-size:.6875rem; color:var(--color-accent); letter-spacing:.12em; font-family:var(--font-mono); text-transform:uppercase; }
+    .staff-name { font-size:var(--text-xl); font-weight:800; color:var(--color-fg); line-height:1.2; font-family:var(--font-serif); }
+    .staff-bio { font-size:.875rem; color:var(--color-muted); line-height:1.7; }
+    .staff-filmography {
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:.12rem;
+      border-top:1px solid var(--color-border);
+      padding-top:.38rem;
+      margin-top:.15rem;
+    }
+    .staff-filmography li {
+      display:grid;
+      grid-template-columns:3.2rem 1fr;
+      gap:.3rem;
+      font-size:.6875rem;
+      color:var(--color-muted);
+      line-height:1.6;
+      align-items:baseline;
+    }
+    .staff-filmography li .sf-year { color:var(--color-accent); font-family:var(--font-mono); font-weight:700; }
+    .staff-filmography li .sf-sub  { font-size:.6875rem; color:rgba(42,42,42,.38); grid-column:2; padding-left:.25rem; line-height:1.5; }
+    .staff-works { list-style:none; display:flex; flex-direction:column; gap:.3rem; }
+    .staff-works li { font-size:.875rem; color:var(--color-muted); line-height:1.7; padding-left:.5rem; border-left:1px solid var(--color-border); }
 
-    /* production table */
-    .prod-table { width: 100%; border-collapse: collapse; }
-    .prod-table td { font-size: var(--text-sm); padding: .55rem .7rem; border-bottom: 1px solid var(--color-border); color: var(--color-muted); line-height: 1.55; vertical-align: top; }
-    .prod-table td:first-child { font-weight: 700; color: var(--color-fg); white-space: nowrap; width: 10rem; }
+    /* ── P7: rel-node (相関図) ── */
+    .rel-node { background:var(--color-card-bg); border:var(--border); border-radius:var(--radius); padding:.45rem .6rem; }
+    .rel-node.center { background:rgba(184,150,12,.08); border-color:rgba(184,150,12,.4); border-radius:50%; width:110px; height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; margin:auto; text-align:center; }
+    .rel-node .rn-name { font-size:.875rem; font-weight:800; color:var(--color-fg); line-height:1.3; }
+    .rel-node .rn-role { font-size:.6875rem; color:var(--color-accent); letter-spacing:.06em; font-family:var(--font-mono); text-transform:uppercase; }
+    .rel-node .rn-desc { font-size:.6875rem; color:var(--color-muted); line-height:1.5; margin-top:.2rem; }
+    .rel-arrow { font-size:.8rem; color:var(--color-accent); text-align:center; display:flex; align-items:center; justify-content:center; }
+
+    /* ── character/story tables ── */
+    .char-table { width:100%; border-collapse:collapse; }
+    .char-table th { font-size:var(--text-sm); font-weight:700; color:var(--color-accent); text-align:left; padding:.4rem .6rem; border-bottom:2px solid rgba(184,150,12,.25); letter-spacing:.06em; }
+    .char-table td { font-size:var(--text-sm); color:var(--color-muted); padding:.4rem .6rem; border-bottom:1px solid var(--color-border); vertical-align:top; line-height:1.7; }
+    .char-table td:first-child { font-weight:700; color:var(--color-fg); white-space:nowrap; min-width:8rem; }
+    .char-table tbody tr:hover td { background:rgba(184,150,12,.03); }
+
+    /* ── P5: キャラクターグリッド（7名） ── */
+    .char-grid {
+      display: flex;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+    .char-cell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+    .char-img-wrap {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(42,42,42,.03);
+      border: 1px dashed rgba(184,150,12,.2);
+    }
+    .char-img-wrap img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .char-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      pointer-events: none;
+    }
+    .char-placeholder .cp-mark {
+      font-size: 1.4rem;
+      color: rgba(184,150,12,.18);
+      line-height: 1;
+    }
+    .char-placeholder .cp-label {
+      font-size: .6875rem;
+      color: rgba(42,42,42,.2);
+      letter-spacing: .1em;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+    .char-cell-name {
+      font-size: .875rem;
+      font-weight: 700;
+      color: var(--color-fg);
+      text-align: center;
+      line-height: 1.3;
+      flex-shrink: 0;
+    }
+    .char-cell-role {
+      font-size: .6875rem;
+      color: var(--color-accent);
+      text-align: center;
+      letter-spacing: .1em;
+      font-family: var(--font-mono);
+      flex-shrink: 0;
+      margin-top: -1px;
+    }
+
+    /* ── scene cards ── */
+    .scene-card { background:#EDEDEA; border:1px solid rgba(42,42,42,.08); border-left:3px solid var(--color-accent); border-radius:0 var(--radius) var(--radius) 0; padding:var(--sp-sm) var(--sp-md); display:flex; flex-direction:column; gap:.4rem; flex:1; }
+    .scene-card .sc-num { font-size:.6875rem; color:var(--color-accent); letter-spacing:.1em; font-family:Georgia,serif; }
+    .scene-card .sc-title { font-size:var(--text-base); font-weight:var(--weight-bold); color:var(--color-fg); line-height:1.4; }
+    .scene-card .sc-body { font-size:var(--text-sm); color:var(--color-muted); line-height:1.7; flex:1; }
+    .scene-card .sc-trigger { font-size:.75rem; font-weight:500; color:var(--color-accent-3); letter-spacing:.03em; border-top:1px solid rgba(184,150,12,.15); padding-top:.3rem; margin-top:.2rem; line-height:1.6; }
+
+    /* ── video frame ── */
+    .video-frame { border-radius:6px; overflow:hidden; background:#0f0e1a; position:relative; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; }
+    .video-frame img { width:100%; height:100%; object-fit:cover; display:block; }
+    .video-frame .vf-label { position:absolute; bottom:6px; left:8px; font-size:.6875rem; color:rgba(184,150,12,.6); font-family:Georgia,serif; letter-spacing:.08em; }
+
+    /* ── production table ── */
+    .prod-table { width:100%; border-collapse:collapse; }
+    .prod-table td { font-size:var(--text-sm); padding:.55rem .7rem; border-bottom:1px solid var(--color-border); color:var(--color-muted); line-height:1.55; vertical-align:top; }
+    .prod-table td:first-child { font-weight:700; color:var(--color-fg); white-space:nowrap; width:10rem; }
+
+    /* ── P2: 原作映画スライド ── */
+    .slide-movie {
+      background: #080710;
+      position: relative;
+      overflow: hidden;
+    }
+    .movie-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-serif);
+      font-size: 16rem;
+      font-weight: 900;
+      color: rgba(196,150,59,.035);
+      letter-spacing: .15em;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+    .movie-thumb-link {
+      display: block;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .movie-thumb-link img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: sepia(15%) contrast(1.08) brightness(.92);
+    }
+    .movie-play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.22);
+      transition: background .2s;
+    }
+    .movie-thumb-link:hover .movie-play-overlay { background: rgba(0,0,0,.38); }
+    .movie-play-overlay span {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(196,150,59,.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      color: #0a0912;
+      padding-left: 5px;
+      box-shadow: 0 0 28px rgba(196,150,59,.3);
+    }
+    .movie-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-sm);
+      z-index: 1;
+      flex: 1;
+    }
+    .movie-cast-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .15rem .4rem;
+      list-style: none;
+    }
+    .movie-cast-list li {
+      font-size: .875rem;
+      color: rgba(240,235,224,.65);
+      font-family: var(--font-serif);
+      letter-spacing: .04em;
+    }
+    .movie-cast-list li:not(:last-child)::after {
+      content: '　·';
+      color: rgba(196,150,59,.3);
+    }
+    .movie-award-item {
+      display: flex;
+      align-items: baseline;
+      gap: .5rem;
+      font-size: .875rem;
+      color: rgba(184,150,12,.8);
+      line-height: 1.7;
+    }
+    .movie-award-item::before {
+      content: '▸';
+      color: var(--color-accent);
+      flex-shrink: 0;
+      font-size: .6875rem;
+    }
+    .movie-url {
+      font-size: .6875rem;
+      color: rgba(184,150,12,.32);
+      font-family: var(--font-mono);
+      letter-spacing: .06em;
+      border-top: 1px solid rgba(184,150,12,.1);
+      padding-top: .35rem;
+      margin-top: auto;
+    }
+
+    /* ── P9/P10: ストーリーカード ── */
+    .story-slide {
+      background: #F7F4EF !important;
+    }
+    .story-title-area {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .story-slide h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #2A2A2A;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: .45em;
+      padding-bottom: .35rem;
+      border-bottom: 1px solid #B8960C;
+    }
+    .story-slide h2::before {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #B8960C;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .story-subtitle-band {
+      display: inline-flex;
+      align-items: center;
+      background: #EDEDEA;
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 11px;
+      color: rgba(42,42,42,.55);
+      letter-spacing: .01em;
+      align-self: flex-start;
+    }
+    .story-list {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(42,42,42,.08);
+      flex: 1;
+      overflow: hidden;
+    }
+    .story-item:last-child { border-bottom: none; }
+    .story-item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .story-badge {
+      background: #B8960C;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 3px;
+      padding: 2px 7px;
+      letter-spacing: .04em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .story-ep-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2A2A2A;
+      line-height: 1.3;
+      flex: 1;
+    }
+    .story-ep-dur {
+      font-size: 11px;
+      color: rgba(42,42,42,.45);
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-weight: 400;
+    }
+    .story-item-body {
+      font-size: 14px;
+      color: #666666;
+      line-height: 1.6;
+      padding-left: 24px;
+      margin: 0;
+      overflow: hidden;
+    }
+    .story-item-hook {
+      display: none;
+    }
+
+    /* ── P12: シリーズ展開 専用 ── */
+    .series-flow {
+      display: flex;
+      align-items: stretch;
+      flex: 0 0 auto;
+    }
+    .series-flow-box {
+      flex: 1;
+      background: #EDEDEA;
+      border-radius: 12px;
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 10px;
+    }
+    .series-flow-box h3 {
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: #2A2A2A;
+      line-height: 1.4;
+      margin: 0;
+    }
+    .series-flow-box p {
+      font-size: var(--text-sm);
+      color: #666666;
+      line-height: 1.7;
+      margin: 0;
+    }
+    .series-flow-arrow {
+      flex-shrink: 0;
+      width: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #B8960C;
+      font-size: 1.3rem;
+      font-weight: 300;
+    }
+    .series-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+      min-height: 0;
+    }
+    .series-card {
+      background: #F7F4EF;
+      border-radius: 8px;
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .series-card-gold   { border: 1.5px solid #B8960C; }
+    .series-card-purple { border: 1.5px solid #6B5B8F; }
+    .series-tag {
+      display: inline-block;
+      font-size: .6875rem;
+      font-weight: 600;
+      border-radius: 4px;
+      padding: .2rem .6rem;
+      background: transparent;
+      align-self: flex-start;
+      letter-spacing: .04em;
+    }
+    .series-tag-gold   { border: 1px solid #B8960C; color: #B8960C; }
+    .series-tag-purple { border: 1px solid #6B5B8F; color: #6B5B8F; }
+    .series-card h3 {
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: #2A2A2A;
+      line-height: 1.4;
+      margin: 0;
+    }
+    .series-card p {
+      font-size: var(--text-sm);
+      color: #666666;
+      line-height: 1.7;
+      margin: 0;
+      flex: 1;
+    }
+
+    /* ── PDF出力スケーリング修正 ── */
+    @media print {
+      .slide {
+        width:  1280px !important;
+        height: 720px  !important;
+        zoom:   0.75;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -65,407 +504,542 @@
 
   <!-- ===== P1: 表紙 ===== -->
   <section class="slide slide-title is-active">
-    <span class="label serif" style="letter-spacing:.15em;">AI Anime Series · 縦型ショート</span>
-    <div style="display:flex;flex-direction:column;gap:.5rem;">
-      <h1>PENROSE</h1>
-      <p style="font-family:Georgia,serif;font-size:var(--text-xl);color:rgba(196,150,59,.75);letter-spacing:.2em;font-weight:400;">破&emsp;星めぐりの歌</p>
-    </div>
-    <div style="width:48px;height:1px;background:rgba(196,150,59,.35);"></div>
-    <h2 style="font-size:var(--text-3xl);color:#f0ebe0;line-height:1.2;font-weight:700;">「幽霊も、依頼人。」</h2>
-    <p style="color:rgba(240,235,224,.6);max-width:540px;line-height:1.72;font-size:var(--text-lg);">
-      死者を代弁する小説家がいる。<br>AIアニメが解き放つ、ちょっとおかしな死と愛の物語。
-    </p>
-    <p style="font-size:var(--text-xs);margin-top:auto;color:rgba(240,235,224,.3);letter-spacing:.04em;">
-      株式会社Chammi &nbsp;/&nbsp; 脚本：PENROSE &nbsp;/&nbsp; 監督：髙橋 果子 &nbsp;/&nbsp; キャラクターデザイン：あらためやむ
-    </p>
-  </section>
+    <div style="display:grid; grid-template-columns:1fr 370px; gap:var(--sp-xl); width:100%; flex:1; align-items:center;">
 
-  <!-- ===== P2: 企画意図 ===== -->
-  <section class="slide slide-content">
-    <div class="body">
-      <h2>なぜ今、この作品か</h2>
-      <p style="font-size:var(--text-lg);font-weight:700;color:var(--color-fg);line-height:1.4;">「"死者"を題材としたミステリー・コメディを、味のあるAIアニメで表現する」</p>
-      <ul class="list">
-        <li>死者を代弁する「故人専門小説家」という唯一無二の職業設定</li>
-        <li>幽霊・死者・葬儀社が日常に溶け込むダーク×ユーモアの世界観</li>
-        <li>死をコメディに——「怖い」より「おかしい」「切ない」後味</li>
-        <li>AIアニメ特有の「不完全な動き」「奇妙な質感」が、この世とあの世の境界を絶妙に演出</li>
-        <li>ターゲット：20〜40代、ミステリー・コメディ好き</li>
-      </ul>
-    </div>
-  </section>
+      <!-- 左：タイトルブロック -->
+      <div style="display:flex; flex-direction:column; gap:var(--sp-sm);">
+        <span class="label serif" style="align-self:flex-start; font-size:.6875rem; letter-spacing:.12em;">縦型ショートプラットフォーム &nbsp;·&nbsp; AI アニメシリーズ</span>
 
-  <!-- ===== P3: 企画概要 ===== -->
-  <section class="slide slide-content" style="--sp-xl:2.5rem;">
-    <div class="body">
-      <h2>主要キャラクター・あらすじ</h2>
-      <div class="cols-2" style="gap:var(--sp-lg);flex:1;align-items:start;">
-        <!-- LEFT: あらすじ -->
-        <div style="display:flex;flex-direction:column;gap:var(--sp-sm);">
-          <h3>あらすじ</h3>
-          <p style="font-size:var(--text-sm);line-height:1.7;">東京・中野の葬儀社ビルに事務所を構える"故人専門小説家"・井浦。遺族の依頼を受け、突然亡くなった人の死の状況から「フィクションの物語」を書く——ただし事実をそのまま書くのではなく、ペンローズの三角形のように「優しい嘘」をついた作品として。見習いアシスタントの南原、葬儀社の奇人・雨部、いつまでも成仏しない幽霊・綾、刑事の安貴、謎の霊能者・緒月——個性豊かな面々に囲まれた、少し変わった奇妙な日常ミステリー。</p>
-          <span class="badge">第1話 破 星めぐりの歌</span>
-          <p style="font-size:var(--text-sm);">95歳で亡くなったシホ婆の依頼が来る。「亡夫の写真が何十年も世界を旅して戻ってくるが、今回だけ半年経っても戻ってこない」——捜索を頼まれた南原が奔走するが手がかりゼロ。するとテレビの宇宙中継に映った外国人飛行士が、その写真を持って民間衛星「ほしめぐり」に乗り込もうとしていた。シホの夫は飛行機乗り——宇宙に行くのが夢だったのだ。</p>
+        <h1 style="color:#f0ebe0; font-family:var(--font-serif); letter-spacing:.08em; font-size:4.5rem; line-height:1.0;">PENROSE</h1>
+        <p style="font-family:var(--font-serif); font-size:var(--text-xl); color:rgba(196,150,59,.72); letter-spacing:.3em; font-weight:400; margin-top:-.25rem;">― 故人専門小説家 ―</p>
+
+        <div style="width:44px; height:1px; background:rgba(196,150,59,.35); margin:.2rem 0;"></div>
+
+        <!-- キャッチコピー 縦書き -->
+        <div style="display:flex; align-items:flex-start; gap:var(--sp-sm);">
+          <p class="catch-vertical">「死因の如何に拘わらず<br>ご遺族様の為だけの小説、<br>承ります。」</p>
         </div>
-        <!-- RIGHT: 主要キャラクター -->
-        <div style="display:flex;flex-direction:column;gap:var(--sp-sm);">
-          <h3>主要キャラクター</h3>
-          <table class="char-table">
-            <thead>
-              <tr><th>名前</th><th>役割・属性</th></tr>
-            </thead>
+
+        <p style="font-size:var(--text-xs); color:rgba(240,235,224,.28); margin-top:auto; letter-spacing:.04em; line-height:1.8;">
+          株式会社Chammi &nbsp;/&nbsp; 脚本・監督：髙橋 果子 &nbsp;/&nbsp; キャラクターデザイン：あらためやむ
+        </p>
+      </div>
+
+      <!-- 右：キービジュアル -->
+      <div style="height:100%; display:flex; align-items:center; justify-content:center; min-height:0;">
+        <img src="assets/penrose-poster.jpg" alt="PENROSE キービジュアル"
+             style="height:580px; width:100%; object-fit:cover; object-position:center top; border-radius:4px; opacity:.9;">
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ===== P2: なぜ今、この作品か ===== -->
+  <section class="slide slide-content" style="--sp-xl:2.5rem;">
+    <div class="body" style="gap:var(--sp-md);">
+
+      <h2>なぜ今、この作品か</h2>
+
+      <div style="display:grid; grid-template-columns:1fr 340px; gap:var(--sp-xl); flex:1; min-height:0; align-items:start;">
+
+        <!-- 左：既存コンテンツ -->
+        <div style="display:flex; flex-direction:column; gap:var(--sp-md);">
+          <!-- コンセプト大見出し -->
+          <div style="border-left:4px solid var(--color-accent); padding:var(--sp-sm) var(--sp-md); background:rgba(196,150,59,.04); border-radius:0 var(--radius) var(--radius) 0;">
+            <p style="font-family:var(--font-serif); font-size:var(--text-xl); font-weight:700; color:var(--color-fg); line-height:1.45; letter-spacing:.02em;">「"死者"を題材としたミステリー・コメディを、<br>味のあるAIアニメで表現する」</p>
+          </div>
+
+          <p style="font-size:var(--text-sm); color:var(--color-muted); line-height:1.7;">高橋果子監督によるインディー実写映画『PENROSE』を、AIショートアニメで表現します。</p>
+
+          <!-- 箇条書き -->
+          <ul class="list">
+            <li>死者を代弁する「故人専門小説家」という唯一無二の職業設定</li>
+            <li>幽霊・死者・葬儀社が日常に溶け込むダーク×ユーモアの世界観</li>
+            <li>死をコメディに——「怖い」より「おかしい」「切ない」後味</li>
+            <li>AIアニメ特有の「不完全な動き」「奇妙な質感」が、この世とあの世の境界を絶妙に演出</li>
+            <li>ターゲット：<span style="color:var(--color-fg); font-weight:700;">20〜40代、ミステリー・コメディ好き</span></li>
+          </ul>
+        </div>
+
+        <!-- 右：制作体制 -->
+        <div style="display:flex; flex-direction:column; gap:var(--sp-sm);">
+          <p style="font-size:.6875rem; color:var(--color-accent); font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin:0;">制作体制</p>
+          <table class="prod-table">
             <tbody>
-              <tr><td>井浦（いうら）</td><td>故人専門小説家。表情とぼしく目と口のみ。南原に対してだけ笑う</td></tr>
-              <tr><td>南原兼太（みなみはらけんた）</td><td>見習いアシスタント。振り回される常識人。よく転ぶ</td></tr>
-              <tr><td>雨部今生（あめぶいまき）</td><td>葬儀社「おくるびと」の奇才。毎回トンデモ新サービスを発明</td></tr>
-              <tr><td>雨部クロミ</td><td>雨部の相棒。無口だがスマホで的確に法律違反を突きつける</td></tr>
-              <tr><td>結城綾（ゆうきあや）</td><td>いつまでも成仏しない幽霊。事務所に居座りケーキを食べている</td></tr>
-              <tr><td>安貴京我（あききょうが）</td><td>刑事。デスクの引き出しに紅茶グッズしか入っていない</td></tr>
-              <tr><td>緒月（おつき）</td><td>月島の霊能者。毎回窓から飛び込んでくる</td></tr>
+              <tr><td>制作会社</td><td>株式会社Chammi</td></tr>
+              <tr><td>脚本原作</td><td>PENROSE（2023年）</td></tr>
+              <tr><td>監督</td><td>髙橋 果子</td></tr>
+              <tr><td>キャラクターデザイン</td><td>あらためやむ</td></tr>
+              <tr><td>形式</td><td>ショートアニメ</td></tr>
+              <tr><td>制作期間</td><td>約1ヶ月</td></tr>
             </tbody>
           </table>
         </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ===== P3: 原作PENROSE紹介 ===== -->
+  <section class="slide slide-content" style="--sp-xl:2rem;">
+    <div class="body" style="gap:var(--sp-sm);">
+
+      <!-- タイトル -->
+      <div>
+        <h2>原作『PENROSE』紹介</h2>
+        <p style="font-size:var(--text-sm); color:var(--color-muted); margin-top:.2rem; line-height:1.4;">警察でも探偵でもない、故人専門小説家という新しいバディドラマ</p>
+      </div>
+
+      <!-- 左右レイアウト -->
+      <div style="display:grid; grid-template-columns:1fr 1.15fr; gap:var(--sp-lg); flex:1; align-items:start; min-height:0;">
+
+        <!-- 左：PENROSE ブランディング + サムネイル -->
+        <div style="display:flex; flex-direction:column; gap:var(--sp-sm);">
+          <div>
+            <p style="font-family:var(--font-serif); font-size:var(--text-2xl); font-weight:700; color:var(--color-fg); letter-spacing:.1em; line-height:1.0;">PENROSE</p>
+            <p style="font-family:var(--font-serif); font-size:.78rem; color:rgba(196,150,59,.65); letter-spacing:.22em; margin-top:.15rem;">故人専門小説家</p>
+          </div>
+          <a class="movie-thumb-link" href="https://youtu.be/Q0G_x-sF8Eo" target="_blank" style="width:100%; aspect-ratio:16/9; display:block;">
+            <img src="https://img.youtube.com/vi/Q0G_x-sF8Eo/maxresdefault.jpg" alt="映画PENROSE"
+                 style="width:100%; height:100%; object-fit:cover; display:block;"
+                 onerror="this.style.background='rgba(26,26,46,.06)'; this.style.minHeight='180px';">
+            <div class="movie-play-overlay"><span>▶</span></div>
+          </a>
+          <p style="font-size:.6875rem; color:var(--color-muted); line-height:1.5;">監督・脚本・編集：髙橋 果子 ／ 2023年</p>
+        </div>
+
+        <!-- 右：本文 + キャスト -->
+        <div style="display:flex; flex-direction:column; gap:.4rem; overflow:hidden; min-height:0;">
+          <p class="body-text-sm">配信プラットフォームでのドラマ視聴がメインとなった今、求められているのは、骨太でちゃんと繰り返し見たくなる物語。</p>
+          <p class="body-text-sm">誰にでも訪れる突然の別れ、死。亡くなった人の足取りを辿り、その人生を物語として描く故人専門の小説家、井浦。そして助手の南原。ふたりの事務所「PENROSE」へ奇妙な客がやってくる。</p>
+          <p class="body-text-sm">彼らを助けているのか邪魔しているのか、ワケありの仲間たちが集まって、そして絡み合う過去……</p>
+          <p class="body-text-sm">クセは強いが、軽妙洒脱、個性あふれるキャラクターたちが織りなす、ポップでオカルト的なミステリードラマ……かと思いきや、「死」や「家族」と向き合う深いドラマ性が流れている。</p>
+          <p class="body-text-sm">死と向き合い、心の傷を負った彼らの幾重にも折り重なった過去を少しずつ紐解いていくストーリー展開に、考察が止まらない！</p>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- ===== P4: キャラクターデザイン ===== -->
+
+  <!-- ===== P4: あらすじ ===== -->
   <section class="slide slide-content" style="--sp-xl:2.5rem;">
-    <div class="body">
-      <h2>キャラクターデザイン — あらためやむ</h2>
-      <div style="display:flex;flex-direction:column;gap:var(--sp-md);flex:1;">
-        <!-- Top row: 2 characters -->
-        <div class="cols-2" style="flex:1;gap:var(--sp-md);">
-          <!-- 井浦 -->
-          <div class="char-design-card">
-            <div class="char-design-imgs">
-              <div class="char-design-img" style="background:linear-gradient(155deg,#0c1a1e 0%,#1a3028 50%,#0a1520 100%);">
-                <img src="assets/iura-color.png" alt="井浦 カラー">
-                <span class="char-design-label">COLOR</span>
-              </div>
-              <div class="char-design-img" style="background:linear-gradient(155deg,#1e1a10 0%,#2a2415 50%,#1a1608 100%);">
-                <img src="assets/iura-line.png" alt="井浦 線画">
-                <span class="char-design-label">LINE ART</span>
-              </div>
-            </div>
-            <p style="font-size:.7rem;color:var(--color-muted);">故人専門小説家。青緑ツートーンヘア、ブラウンスーツ。180cm。表情とぼしく、南原に対してだけ笑う。</p>
-          </div>
-          <!-- 南原 -->
-          <div class="char-design-card">
-            <div class="char-design-imgs">
-              <div class="char-design-img" style="background:linear-gradient(155deg,#101c10 0%,#1a2a1a 50%,#0e1a0e 100%);">
-                <img src="assets/minamihara-color.png" alt="南原 カラー">
-                <span class="char-design-label">COLOR</span>
-              </div>
-              <div class="char-design-img" style="background:linear-gradient(155deg,#1a1a0e 0%,#2a2a18 50%,#181808 100%);">
-                <img src="assets/minamihara-line.png" alt="南原 線画">
-                <span class="char-design-label">LINE ART</span>
-              </div>
-            </div>
-            <p style="font-size:.7rem;color:var(--color-muted);">見習いアシスタント。ダークグリーン髪、グレーパーカー。173cm。振り回される常識人。よく転ぶ。</p>
-          </div>
+    <div class="body" style="gap:var(--sp-sm);">
+      <h2>あらすじ</h2>
+
+      <div class="cols-2" style="gap:var(--sp-md); flex:1; align-items:start;">
+
+        <!-- 左カラム -->
+        <div style="display:flex; flex-direction:column; gap:.45rem;">
+          <p class="synopsis-opener"><span class="synopsis-rule">───</span>東京。下町のとある一角。<br>そこに一風変わった小説家が少々奇妙な日常を送っていた。<br>小説家の小さな事務所の名前は「ペンローズ」</p>
+          <p class="body-text-sm">遺族の依頼を受け、事故や病気、自殺などで突然亡くなった人の死因や亡くなる前の行動や状況などから、死に至った理由を推察し、それを「フィクション」の物語として描く、<span class="highlight">"故人専門小説家"</span>の井浦。</p>
+          <p class="body-text-sm">街の一角にある葬儀会社の建物の地下に間借りをして小さな事務所を構え、小説家見習いで助手の南原と一緒に依頼を受けている。</p>
+          <p class="body-text-sm">故人と遺族の関係や死の状況は依頼ごとにさまざまで、時には倫理的に難しい依頼も。</p>
         </div>
-        <!-- Bottom row: 5 COMING SOON -->
-        <div style="display:flex;flex-direction:row;gap:.5rem;">
-          <div class="char-coming-soon" style="flex:1;min-height:60px;">
-            <span class="cs-name">雨部今生</span>
-            <span class="cs-label">CHARACTER COMING SOON</span>
-          </div>
-          <div class="char-coming-soon" style="flex:1;min-height:60px;">
-            <span class="cs-name">雨部クロミ</span>
-            <span class="cs-label">CHARACTER COMING SOON</span>
-          </div>
-          <div class="char-coming-soon" style="flex:1;min-height:60px;">
-            <span class="cs-name">結城綾</span>
-            <span class="cs-label">CHARACTER COMING SOON</span>
-          </div>
-          <div class="char-coming-soon" style="flex:1;min-height:60px;">
-            <span class="cs-name">安貴京我</span>
-            <span class="cs-label">CHARACTER COMING SOON</span>
-          </div>
-          <div class="char-coming-soon" style="flex:1;min-height:60px;">
-            <span class="cs-name">緒月</span>
-            <span class="cs-label">CHARACTER COMING SOON</span>
-          </div>
+
+        <!-- 右カラム -->
+        <div style="display:flex; flex-direction:column; gap:.45rem;">
+          <p class="body-text-sm">小説として書くために、死の事実をあの手この手を使って調査するが、その事実をそのまま書くことはしない。</p>
+          <p class="body-text-sm">井浦の書く小説はあくまでフィクションであり、井浦の感性を通じて物語として生まれる「作品」だ。ただ一人の読者──依頼人（＝残された遺族）が読んだ後にどう感じたか、何を考えるかに重点を置いて物語を書く。</p>
+          <p class="body-text-sm">事実とは少し捻れたとしても、読者の心の中で、思いに折り合いをつけ、一区切りがつくのなら……</p>
+          <p class="body-text-sm" style="border-left:2px solid rgba(196,150,59,.3); padding-left:var(--sp-sm); color:var(--color-fg);">ペンローズの三角形のように優しい嘘をつく小説家と、その周りで、協力しているのか邪魔をしているのか、集まってくるワケありで、個性豊かな仲間たちとのちょっと奇妙な日常———</p>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- ===== P5: スタッフ紹介 ===== -->
+
+  <!-- ===== P5: キャラクターデザイン ===== -->
   <section class="slide slide-content" style="--sp-xl:2.5rem;">
-    <div class="body">
+    <div class="body" style="gap:var(--sp-sm);">
+
+      <h2>キャラクターデザイン</h2>
+
+      <!-- 7名 2段グリッド（1段目:4名 / 2段目:3名） -->
+      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px 14px; flex:1; min-height:0; align-content:stretch;">
+
+        <!-- 井浦 -->
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div class="char-img-wrap" style="flex:none; aspect-ratio:3/2; width:100%; height:auto;">
+            <div class="char-placeholder"><span class="cp-mark">✦</span><span class="cp-label">ARTWORK</span></div>
+            <img src="assets/iura-color.png" alt="井浦" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block;" onerror="this.style.display='none';">
+          </div>
+          <p class="char-cell-name">井浦</p>
+          <p class="char-cell-role">NOVELIST</p>
+        </div>
+
+        <!-- 南原兼太 -->
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div class="char-img-wrap" style="flex:none; aspect-ratio:3/2; width:100%; height:auto;">
+            <div class="char-placeholder"><span class="cp-mark">✦</span><span class="cp-label">ARTWORK</span></div>
+            <img src="assets/minamihara-color.png" alt="南原兼太" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block;" onerror="this.style.display='none';">
+          </div>
+          <p class="char-cell-name">南原兼太</p>
+          <p class="char-cell-role">ASSISTANT</p>
+        </div>
+
+        <!-- 雨部今生 -->
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div class="char-img-wrap" style="flex:none; aspect-ratio:3/2; width:100%; height:auto;">
+            <div class="char-placeholder"><span class="cp-mark" style="font-size:.6rem; letter-spacing:.1em; color:var(--color-muted);">Coming Soon</span></div>
+          </div>
+          <p class="char-cell-name">雨部今生</p>
+          <p class="char-cell-role">UNDERTAKER</p>
+        </div>
+
+        <!-- 雨部クロミ -->
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div class="char-img-wrap" style="flex:none; aspect-ratio:3/2; width:100%; height:auto;">
+            <div class="char-placeholder"><span class="cp-mark">✦</span><span class="cp-label">ARTWORK</span></div>
+            <img src="assets/kuromi-color.png" alt="雨部クロミ" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block;" onerror="this.style.display='none';">
+          </div>
+          <p class="char-cell-name">雨部クロミ</p>
+          <p class="char-cell-role">SILENT PARTNER</p>
+        </div>
+
+        <!-- 結城綾 -->
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div class="char-img-wrap" style="flex:none; aspect-ratio:3/2; width:100%; height:auto;">
+            <div class="char-placeholder"><span class="cp-mark" style="font-size:.6rem; letter-spacing:.1em; color:var(--color-muted);">Coming Soon</span></div>
+          </div>
+          <p class="char-cell-name">結城綾</p>
+          <p class="char-cell-role">GHOST</p>
+        </div>
+
+        <!-- 安貴京我 -->
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div class="char-img-wrap" style="flex:none; aspect-ratio:3/2; width:100%; height:auto;">
+            <div class="char-placeholder"><span class="cp-mark" style="font-size:.6rem; letter-spacing:.1em; color:var(--color-muted);">Coming Soon</span></div>
+          </div>
+          <p class="char-cell-name">安貴京我</p>
+          <p class="char-cell-role">DETECTIVE</p>
+        </div>
+
+        <!-- 緒月 -->
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div class="char-img-wrap" style="flex:none; aspect-ratio:3/2; width:100%; height:auto;">
+            <div class="char-placeholder"><span class="cp-mark" style="font-size:.6rem; letter-spacing:.1em; color:var(--color-muted);">Coming Soon</span></div>
+          </div>
+          <p class="char-cell-name">緒月</p>
+          <p class="char-cell-role">SPIRIT MEDIUM</p>
+        </div>
+
+      </div>
+
+      <!-- クレジット -->
+      <p style="font-size:.6875rem; color:var(--color-muted); text-align:right; letter-spacing:.04em; flex-shrink:0;">キャラクターデザイン：あらためやむ</p>
+
+    </div>
+  </section>
+
+
+  <!-- ===== P6: 制作スタッフ ===== -->
+  <section class="slide slide-content" style="--sp-xl:2rem;">
+    <div class="body" style="gap:var(--sp-sm);">
       <h2>制作スタッフ</h2>
-      <div class="cols-2" style="flex:1;align-items:start;">
-        <!-- LEFT: 監督 -->
-        <div class="card card-gold">
-          <span class="badge" style="margin-bottom:var(--sp-xs);">監督</span>
-          <h3>髙橋 果子（たかはし かこ）</h3>
-          <p style="font-size:.72rem;color:var(--color-muted);">映像監督・脚本・撮影・編集 / 宮城県出身。東北芸術工科大学 歴史遺産学科卒。</p>
-          <div class="divider"></div>
-          <div style="display:flex;flex-direction:column;gap:.3rem;">
-            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">NHK Eテレ「グレーテルのかまど」Dir・フードコーディネート・編集（2022〜）</p>
-            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">NHK Eテレ「人と暮らしと、台所」Dir・取材・編集（2020〜）ナレーション：麻生久美子</p>
-            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">SONY「映画×ブラビア」プロモーション Dir</p>
-            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">自主映画「PENROSE」監督・脚本・編集（2023年11月）出演：蒼木陣、江口航 ほか</p>
-            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">MV「井澤巧麻 Pure as Ice」監督・撮影・編集</p>
-            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">「こどもちゃれんじぷち」ビデオコンテンツ 監督・助監督</p>
-            <p style="font-size:.7rem;color:var(--color-muted);line-height:1.5;">中国語講座ドラマ「＃ぷらどら」シリーズ 監督・脚本</p>
+      <div class="staff-layout">
+
+        <!-- 左：監督 -->
+        <div class="staff-section">
+          <div style="display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;">
+            <span class="staff-role-label">脚本・監督</span>
+            <span class="staff-name">髙橋 果子</span>
+            <span style="font-size:.6875rem; color:var(--color-muted);">（たかはし かこ）</span>
           </div>
-          <p style="font-size:.65rem;color:var(--color-accent-3);">使用ツール：Premiere Pro / DaVinci Resolve / Photoshop / Illustrator</p>
+          <p class="staff-bio">映像監督・脚本・撮影・編集。1993年宮城県出身。東北芸術工科大学卒。民俗文化映像研究所出身で民俗学者の田口洋美に従事。番組制作プロダクションにてNHK Eテレ「グレーテルのかまど」「人と暮らしと、台所」シリーズ、ベネッセコーポレーション「こどもちゃれんじぷち」シリーズ制作を行う一方で、「gokigen Films」を立ち上げ、自主制作映画で監督・脚本を務める。</p>
+          <ul class="staff-filmography">
+            <li>
+              <span class="sf-year">2022</span>
+              <span>短編映画「隣のひと」&emsp;監督・編集</span>
+            </li>
+            <li>
+              <span class="sf-year">2023</span>
+              <span>長編映画「PENROSE」&emsp;監督・脚本・編集</span>
+            </li>
+            <li>
+              <span class="sf-year">2022〜</span>
+              <span>NHK Eテレ「グレーテルのかまど」&emsp;ディレクター・フードコーディネート・編集</span>
+            </li>
+            <li>
+              <span class="sf-year"></span>
+              <span class="sf-sub">「パンどろぼうのぼうしパン」「ハローキティのアップルパイ」「SPY×FAMILYのマカロン」ほか多数</span>
+            </li>
+            <li>
+              <span class="sf-year">2020〜</span>
+              <span>NHK Eテレ「人と暮らしと、台所」&emsp;ディレクター・取材・編集　ナレーション：麻生久美子</span>
+            </li>
+            <li>
+              <span class="sf-year"></span>
+              <span>SONY「映画をもっと好きになる【映画×ブラビア】」&emsp;ディレクター</span>
+            </li>
+            <li>
+              <span class="sf-year"></span>
+              <span>「こどもちゃれんじぷち」ビデオコンテンツ&emsp;監督・助監督</span>
+            </li>
+            <li>
+              <span class="sf-year"></span>
+              <span>MV「井澤巧麻 Pure as Ice」&emsp;監督・撮影・編集</span>
+            </li>
+            <li>
+              <span class="sf-year"></span>
+              <span>中国語講座×若手俳優ドラマ「＃ぷらどら」シリーズ&emsp;監督・脚本</span>
+            </li>
+          </ul>
         </div>
-        <!-- RIGHT: キャラクターデザイン -->
-        <div class="card card-purple">
-          <span class="badge badge-purple" style="margin-bottom:var(--sp-xs);">キャラクターデザイン</span>
-          <h3>あらためやむ</h3>
-          <p style="font-size:.72rem;color:var(--color-muted);">元パイオニアLDC・ユニバーサル・アミューズソフト等にて映像プロデューサーを歴任。晩年、漫画家に転身。ウェブトゥーン中心に活動。</p>
-          <div class="divider"></div>
-          <p style="font-size:.7rem;color:var(--color-muted);">代表作：「もんすたっ！」「タマオのおたま」「ののちゃん」「RUN」「仔猫をもらってきた」ほか</p>
-          <p style="font-size:.65rem;"><a href="https://www.pixiv.net/users/779169" target="_blank" style="color:var(--color-accent-2);">Pixiv: pixiv.net/users/779169 ↗</a></p>
+
+        <!-- 中：キャラクターデザイン -->
+        <div class="staff-section">
+          <div style="display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;">
+            <span class="staff-role-label">キャラクターデザイン</span>
+            <span class="staff-name">あらためやむ</span>
+          </div>
+          <p class="staff-bio">元パイオニアLDC・ユニバーサル・アミューズソフト等にて映像プロデューサーを歴任。現在はウェブトゥーンを中心に漫画家として活動。</p>
+          <ul class="staff-works" style="margin-top:.2rem;">
+            <li>代表作：「もんすたっ！」「タマオのおたま」</li>
+            <li>「ののちゃん」「RUN」「仔猫をもらってきた」ほか</li>
+          </ul>
+          <p style="font-size:.6875rem; color:var(--color-accent); margin-top:.35rem;">
+            <a href="https://www.pixiv.net/users/779169" target="_blank" style="color:var(--color-accent); text-decoration:none;">Pixiv: pixiv.net/users/779169 ↗</a>
+          </p>
         </div>
+
+        <!-- 右：AIアニメーション -->
+        <div class="staff-section">
+          <div style="display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;">
+            <span class="staff-role-label">AIアニメーション</span>
+            <span class="staff-name">Yachimat</span>
+          </div>
+          <p class="staff-bio">株式会社リクルート、世界コスプレサミットCFO、Netflixアニメにおける出資およびアシスタントプロデューサーを経てAIアニメ制作者に。</p>
+          <p class="staff-bio">現在はWonderStudio、Aura Production、Promise AIなど米国拠点のアニメスタジオなどと協業しAIアニメの制作を行う。</p>
+          <p class="staff-bio">400名のクリエイターが集まるAIクリエイターコミュニティ「AI Creator's Directry」主宰。</p>
+          <p style="font-size:.6875rem; color:var(--color-accent); margin-top:.35rem;">
+            <a href="https://x.com/yachimat_manga" target="_blank" style="color:var(--color-accent); text-decoration:none;">X: @yachimat_manga ↗</a>
+          </p>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- ===== P6: ベンチマーク ===== -->
-  <section class="slide slide-content">
-    <div class="body">
-      <p style="font-size:var(--text-lg);font-weight:700;color:var(--color-fg);line-height:1.4;margin-bottom:var(--sp-sm);">「実写映画から生まれたIPが、AIアニメとして新たな命を吹き込まれる。」</p>
-      <div class="cols-3" style="flex:1;">
-        <!-- ① PENROSE -->
-        <div class="card card-sepia">
-          <span class="badge badge-sepia" style="margin-bottom:var(--sp-xs);">監督作 / 原作IP</span>
-          <h3>PENROSE</h3>
-          <p style="font-size:var(--text-sm);">2023年／髙橋果子 監督・脚本。本企画の実写原作。「故人専門小説家」という世界観の起点。出演：蒼木陣・江口航ほか。</p>
-          <span style="font-size:.72rem;color:var(--color-accent-3);font-weight:600;margin-top:auto;display:block;">→ 本企画はこのIPのAIアニメ化。監督自身の物語を自らの手で動かす。</span>
+
+
+  <!-- ===== P9: ストーリー全体構成 ① #1–#5 ===== -->
+  <section class="slide story-slide" style="padding:22px 44px;">
+    <div class="story-title-area">
+      <h2>ストーリー全体構成</h2>
+      <span class="story-subtitle-band">第1話パイロット版『破 星めぐりの歌』｜全10話｜各話約1.5〜2分｜合計約15〜20分</span>
+    </div>
+    <div class="story-list">
+
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#1</span>
+          <span class="story-ep-title">「星めぐりの歌」</span>
+          <span class="story-ep-dur">〜2min</span>
         </div>
-        <!-- ② ゾンビランドサガ -->
-        <div class="card card-purple">
-          <span class="badge badge-purple" style="margin-bottom:var(--sp-xs);">参照フォーマット</span>
-          <h3>ゾンビランドサガ</h3>
-          <p style="font-size:var(--text-sm);">2018〜／MAPPA。死者をアイドルに復活させる「死×コメディ」のジャンル開拓作。シーズン2まで続く人気シリーズ。</p>
-          <span style="font-size:.72rem;color:var(--color-accent-2);font-weight:600;margin-top:auto;display:block;">→ 「死者が普通にそこにいる日常」という本企画の世界観と共鳴するリファレンス</span>
-        </div>
-        <!-- ③ 銭天童 -->
-        <div class="card card-gold">
-          <span class="badge" style="margin-bottom:var(--sp-xs);">AIアニメ最前線</span>
-          <h3>銭天童</h3>
-          <p style="font-size:var(--text-sm);">中国発のAIアニメシリーズ。AIによるキャラクター表現とストーリーテリングの可能性を切り開いた作品として注目を集める。</p>
-          <span style="font-size:.72rem;color:var(--color-accent);font-weight:600;margin-top:auto;display:block;">→ AIアニメが「物語コンテンツ」として成立することを示す最前線の事例</span>
-        </div>
+        <p class="story-item-body">屋上で「♪あかいめだまのさそり……」と星めぐりの歌を鼻唄で歌う井浦。2階の事務所では南原が固定電話のコードを引きずりながらペコペコ対応中。「なんでも屋じゃないんですから！」——電話を切った途端、コードに足を取られて盛大にコケる。</p>
+        <p class="story-item-hook">▶ 次回：「依頼内容は……写真を探してほしい？」</p>
       </div>
+
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#2</span>
+          <span class="story-ep-title">「シホ婆の写真」</span>
+          <span class="story-ep-dur">〜2min</span>
+        </div>
+        <p class="story-item-body">「無くなった写真を探して欲しい」という遺族からの電話だった。故人・星シホ、享年95歳。同じく亡くなった夫の写真が何十回も世界を旅して手元に戻り続けてきたが、今回だけ半年戻ってこない。1階では雨部が改造ドローンを前に「名付けてドローン葬じゃ〜！」と高笑い。クロミが無言でスマホを突きつける——「航空法違反」「領空侵犯」「関税法違反」スワイプ……</p>
+        <p class="story-item-hook">▶ 次回：「写真の手がかりを求めて警察へ」</p>
+      </div>
+
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#3</span>
+          <span class="story-ep-title">「安貴の引き出しは紅茶だけ」</span>
+          <span class="story-ep-dur">〜1.5min</span>
+        </div>
+        <p class="story-item-body">警察署。「海外の遺失物は管轄外」と言いながら安貴が机の引き出しを開けると——中身は紅茶グッズしかない。ミニコンロでお湯を沸かし、「相棒」の右京のように紅茶を淹れ始める安貴に南原「……暇じゃん」後ろの刑事が広げた新聞に「民間人工衛星ほしめぐり本日打ち上げ」の見出しが映り込む。</p>
+        <p class="story-item-hook">▶ 次回：「今回ばかりはマジで無理っす……」</p>
+      </div>
+
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#4</span>
+          <span class="story-ep-title">「幽霊のいる事務所」</span>
+          <span class="story-ep-dur">〜2min</span>
+        </div>
+        <p class="story-item-body">仏壇の前でケーキを頬張る死霊・結城綾「はぁ〜ん♡おいし〜♡」雨部が両手を広げて突進するが当然空振り「綾ちゃん……俺の愛は本物だよ……」クロミがグーサインを出す。「ねークロミちゃんテレビつけて〜」——テレビがつく。</p>
+        <p class="story-item-hook">▶ 次回：「ワイドショーに……何かが映っている」</p>
+      </div>
+
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#5</span>
+          <span class="story-ep-title">「緒月、窓から飛び込む」</span>
+          <span class="story-ep-dur">〜2min</span>
+        </div>
+        <p class="story-item-body">「ハッ！」窓が開き、緒月がカフェテーブルの上に仁王立ち。綾「土足やめてよ〜」南原「なんで毎回飛び込んでくるんですか！！」「シホ婆はウチの古参客だ。写真に霊力を込めてやったんだ」——タバコの煙を南原に浴びせながら怒りをぶつける。</p>
+        <p class="story-item-hook">▶ 次回：「写真が世界を旅してきた本当の理由とは」</p>
+      </div>
+
     </div>
   </section>
 
-  <!-- ===== P7: 相関図 ===== -->
-  <section class="slide slide-content">
-    <div class="body">
-      <h2>キャラクター相関図</h2>
-      <div style="flex:1;display:grid;grid-template-rows:1fr 1fr 1fr;grid-template-columns:1fr 1.8fr 1fr;gap:var(--sp-sm);align-items:center;">
-        <!-- Row 1: 外部キャラ -->
-        <div class="rel-node" style="border-top:2px solid var(--color-accent-4);">
-          <div class="rn-name">安貴京我</div>
-          <div class="rn-role">DETECTIVE</div>
-          <div class="rn-desc">紅茶マニア。実は頼りになる</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;">
-          <div class="rel-node" style="width:100%;text-align:center;border-top:2px solid rgba(196,150,59,.4);">
-            <div class="rn-name" style="font-size:.72rem;">遺族（各話）</div>
-            <div class="rn-desc">依頼→故人の状況調査→「フィクション」として物語化→ただ一人の読者へ</div>
-          </div>
-          <div style="color:var(--color-accent);font-size:.9rem;">↓</div>
-        </div>
-        <div class="rel-node" style="border-top:2px solid var(--color-accent-5);">
-          <div class="rn-name">緒月</div>
-          <div class="rn-role">SPIRIT MEDIUM</div>
-          <div class="rn-desc">毎回窓から飛び込んでくる。月島の"クロ"な人脈</div>
-        </div>
 
-        <!-- Row 2: Core -->
-        <div style="display:flex;flex-direction:column;gap:.4rem;">
-          <div class="rel-node" style="border-left:3px solid var(--color-accent);">
-            <div class="rn-name">南原兼太</div>
-            <div class="rn-role">ASSISTANT</div>
-            <div class="rn-desc">振り回される日常担当</div>
-          </div>
-          <div class="rel-node" style="border-left:3px solid var(--color-accent-5);">
-            <div class="rn-name">結城綾</div>
-            <div class="rn-role">GHOST</div>
-            <div class="rn-desc">成仏できない元依頼人の霊。ケーキを食べる</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:center;">
-          <div class="rel-node center">
-            <div class="rn-name" style="font-size:1rem;font-weight:900;">井浦</div>
-            <div class="rn-role" style="font-size:.58rem;">故人専門小説家</div>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:.4rem;">
-          <div class="rel-node" style="border-left:3px solid var(--color-accent-3);">
-            <div class="rn-name">雨部今生</div>
-            <div class="rn-role">UNDERTAKER</div>
-            <div class="rn-desc">毎回トンデモ新サービスを発明</div>
-          </div>
-          <div class="rel-node" style="border-left:3px solid var(--color-accent-2);">
-            <div class="rn-name">雨部クロミ</div>
-            <div class="rn-role">SILENT PARTNER</div>
-            <div class="rn-desc">スマホで的確に法律違反を指摘</div>
-          </div>
-        </div>
+  <!-- ===== P10: ストーリー全体構成 ② #6–#10 ===== -->
+  <section class="slide story-slide" style="padding:22px 44px;">
+    <div class="story-title-area">
+      <h2>ストーリー全体構成（続き）</h2>
+      <span class="story-subtitle-band">第1話パイロット版『破 星めぐりの歌』｜#6〜#10</span>
+    </div>
+    <div class="story-list">
 
-        <!-- Row 3: 依頼構造 -->
-        <div></div>
-        <div class="rel-node" style="background:rgba(196,150,59,.05);border:1px dashed rgba(196,150,59,.3);text-align:center;">
-          <div class="rn-name" style="font-size:.72rem;">各話の故人（死者）</div>
-          <div class="rn-desc">南原が調査 → 井浦が「優しい嘘」で物語化</div>
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#6</span>
+          <span class="story-ep-title">「写真が旅する理由」</span>
+          <span class="story-ep-dur">〜2min</span>
         </div>
-        <div></div>
+        <p class="story-item-body">緒月が語る。霊力を込められた亡夫の写真は、シホが生きている間は必ず手元に戻り続けてきた。「もう戻らなくていいから、存分に行っといでって言ったのよ——」まだ誰も知らないシホの本心。「ねえ南ちゃん、テレビ」——綾が指さすテレビ画面に、宇宙飛行士が古いセピア色の写真を掲げている。</p>
+        <p class="story-item-hook">▶ 次回：「その写真、見覚えがある……」</p>
       </div>
+
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#7</span>
+          <span class="story-ep-title">「写真が宇宙にいる」</span>
+          <span class="story-ep-dur">〜1.5min</span>
+        </div>
+        <p class="story-item-body">「半年前、突然この写真が落ちてきたんだよ。彼は僕のラッキーボーイ——HAHAHA！」飛行士の言葉に南原の顔が白くなる。テレビ画面でカウントダウンが始まる。「い、井浦さぁん！！写真が宇宙に持ってかれちゃいましたよぉ！！！」</p>
+        <p class="story-item-hook">▶ 次回：「屋上に駆け上がる南原。井浦はすでに——」</p>
+      </div>
+
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#8</span>
+          <span class="story-ep-title">「屋上の井浦」</span>
+          <span class="story-ep-dur">〜2min</span>
+        </div>
+        <p class="story-item-body">血相を変えて屋上に駆け上がった南原。屋上には原稿用紙と鉛筆を持った井浦がゆっくりと起き上がるところだった。霊感のない井浦には見えないが、傍のベンチにはシホが座っている——これは井浦が故人を「想像」する時間だ。</p>
+        <p class="story-item-hook">▶ 次回：「シホの声が聞こえる——これは、井浦の想像だ」</p>
+      </div>
+
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#9</span>
+          <span class="story-ep-title">「いってらっしゃい」</span>
+          <span class="story-ep-dur">〜2min</span>
+        </div>
+        <p class="story-item-body">シホの声（井浦の想像）：「あの人は飛行機乗りだったからねぇ。宇宙にも飛んでいきたいと言ってたの」「もう戻らなくていいから、存分に行っといで……よかった、夢が叶って。いってらっしゃい。」青空にロケットの煙だけが残る。騒ぎ続ける南原をよそに、井浦はゆっくりと原稿用紙を折り畳む。</p>
+        <p class="story-item-hook">▶ 次回：「南ちゃん、書き上がったよ」</p>
+      </div>
+
+      <div class="story-item">
+        <div class="story-item-header">
+          <span class="story-badge">#10</span>
+          <span class="story-ep-title">「星めぐりの歌、完成」</span>
+          <span class="story-ep-dur">〜2min</span>
+        </div>
+        <p class="story-item-body">原稿用紙を差し出す井浦。タイトルには「星めぐりの歌」。「写真は……どうするんですか」「戻ってこなくていいんだよ」——南原が沈黙し、空を見上げる。事務所に戻ると——ドアのチャイムが鳴る。また次の依頼が来た。</p>
+        <p class="story-item-hook">〈PENROSE 破　星めぐりの歌　END〉</p>
+      </div>
+
     </div>
   </section>
 
-  <!-- ===== P8: ストーリー① ===== -->
-  <section class="slide slide-content" style="--sp-xl:2.5rem;">
-    <div class="body">
-      <h2>ストーリー全体構成 ① シリーズ設定〜第1話前半</h2>
-      <div class="ep-log">
-        <!-- LEFT -->
-        <div class="ep-col">
-          <div class="ep-section-title">シリーズ設定（毎話共通）</div>
-          <div class="ep-item"><span class="ep-num">#1</span><span>舞台設定｜東京・中野。葬儀社ビルに事務所を構える"故人専門小説家"井浦と見習い南原</span></div>
-          <div class="ep-item"><span class="ep-num">#2</span><span>仕事の仕組み｜遺族の依頼→故人の死の状況を調査→事実を「フィクション」の物語として執筆→ただ一人の読者（依頼人）に届ける</span></div>
-          <div class="ep-item"><span class="ep-num">#3</span><span>ペンローズの哲学｜二次元では成立するが三次元では不可能な図形。井浦の書く物語もそういう「優しい嘘」</span></div>
-          <div class="ep-item"><span class="ep-num">#4</span><span>住人たち｜葬儀社の雨部&クロミ、成仏しない幽霊・綾、刑事・安貴、霊能者・緒月</span></div>
 
-          <div class="ep-section-title" style="margin-top:.5rem;">第1話「破 星めぐりの歌」序盤</div>
-          <div class="ep-item"><span class="ep-num">#5</span><span>屋上の鼻唄｜葬儀社ビル屋上。原稿用紙に囲まれ仰向けになる井浦が「♪あかいめだまのさそり…」と宮沢賢治の星めぐりの歌を口ずさんでいる</span></div>
-          <div class="ep-item"><span class="ep-num">#6</span><span>南原に電話｜「写真を探してほしい」という依頼電話。「僕は何でも屋じゃなく小説家！」と言い張るも渋々引き受ける</span></div>
-          <div class="ep-item"><span class="ep-num">#7</span><span>コケる南原｜電話を切った南原、電話線が足に絡まって盛大にコケる</span></div>
-          <div class="ep-item"><span class="ep-num">#8</span><span>依頼の内容｜95歳で亡くなったシホ婆。亡夫の写真が何十年も世界を旅して戻ってくるを繰り返していたが、今回だけ半年経っても戻ってこない</span></div>
+  <!-- ===== P11: ショートアニメ×オムニバス形式 ===== -->
+  <section class="slide slide-content" style="background:#F7F4EF !important; --sp-xl:2.5rem;">
+    <div class="body" style="gap:var(--sp-md);">
+
+      <!-- タイトル -->
+      <div>
+        <h2>ショートアニメ × オムニバス形式</h2>
+        <p style="font-size:var(--text-sm); color:rgba(42,42,42,.5); font-weight:400; margin-top:.3rem;">1エピソード＝5〜7ショート（各1〜3分）で構成</p>
+      </div>
+
+      <!-- セクション見出し：ポイント -->
+      <p style="font-size:.6875rem; font-weight:700; letter-spacing:.14em; color:#B8960C; font-family:var(--font-mono); text-transform:uppercase; margin:0; padding-bottom:.4rem; border-bottom:1px solid rgba(184,150,12,.2);">ポイント</p>
+
+      <!-- 3つのポイント：左ボーダーアクセント、カードなし -->
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--sp-lg);">
+
+        <div style="display:flex; flex-direction:column; gap:8px; border-left:3px solid #B8960C; padding-left:16px;">
+          <span style="font-size:.6875rem; font-weight:700; color:#B8960C; letter-spacing:.12em; font-family:var(--font-mono); text-transform:uppercase;">累積効果</span>
+          <p style="font-size:var(--text-base); font-weight:700; color:#2A2A2A; margin:0; line-height:1.4;">キャラクターへの愛着</p>
+          <p style="font-size:var(--text-sm); color:#666666; margin:0; line-height:1.7;">各話ゲスト故人と主要キャラの交差が積み重なり、感情移入が深まる</p>
         </div>
-        <!-- RIGHT -->
-        <div class="ep-col">
-          <div class="ep-section-title">中盤：調査と失敗</div>
-          <div class="ep-item"><span class="ep-num">#9</span><span>雨部のドローン葬｜「遺灰を乗せたソーラーパネル搭載ドローンで半永久の空の旅！ドローン葬じゃ〜！」と高笑い</span></div>
-          <div class="ep-item"><span class="ep-num">#10</span><span>法律違反の壁｜クロミが無言でスマホを差し出す。「航空法違反」「領空侵犯」「関税法違反」……次々とスワイプ</span></div>
-          <div class="ep-item"><span class="ep-num">#11</span><span>雨部の反論｜「俺は政府に極太パイプを持つ世界の雨部だぜ！人間の法律なんて俺の前では無力ゥ〜！」</span></div>
-          <div class="ep-item"><span class="ep-num">#12</span><span>警察に相談｜安貴のデスクへ。引き出しを開けると紅茶グッズしか入っていない。南原「暇じゃん」安貴「なんだ？」</span></div>
-          <div class="ep-item"><span class="ep-num">#13</span><span>海外は管轄外｜「海外での遺失物は警察の管轄じゃない。それくらい井浦に教われよ」</span></div>
-          <div class="ep-item"><span class="ep-num">#14</span><span>手がかりゼロ｜事務所に戻る南原「今回ばかりはマジで無理っす…」</span></div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; border-left:3px solid #6B5B8F; padding-left:16px;">
+          <span style="font-size:.6875rem; font-weight:700; color:#6B5B8F; letter-spacing:.12em; font-family:var(--font-mono); text-transform:uppercase;">拡散設計</span>
+          <p style="font-size:var(--text-base); font-weight:700; color:#2A2A2A; margin:0; line-height:1.4;">切り抜き前提の構成</p>
+          <p style="font-size:var(--text-sm); color:#666666; margin:0; line-height:1.7;">各パートが1〜3分の縦型ショートとして独立して成立。冒頭からオチまで完結</p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; border-left:3px solid #B8960C; padding-left:16px;">
+          <span style="font-size:.6875rem; font-weight:700; color:#B8960C; letter-spacing:.12em; font-family:var(--font-mono); text-transform:uppercase;">シリーズ展開</span>
+          <p style="font-size:var(--text-base); font-weight:700; color:#2A2A2A; margin:0; line-height:1.4;">伏線構造</p>
+          <p style="font-size:var(--text-sm); color:#666666; margin:0; line-height:1.7;">綾の成仏・緒月の過去・井浦の謎が各話に散りばめられ、シリーズとして回収される</p>
+        </div>
+
+      </div>
+
+      <!-- セクション見出し：構成 -->
+      <p style="font-size:.6875rem; font-weight:700; letter-spacing:.14em; color:rgba(42,42,42,.5); font-family:var(--font-mono); text-transform:uppercase; margin:0; padding-bottom:.4rem; border-bottom:1px solid rgba(42,42,42,.12);">構成</p>
+
+      <!-- フロー：A→B→C→D パート -->
+      <div style="display:flex; align-items:stretch; flex:1; min-height:0;">
+        <div style="flex:1; background:#EDEDEA; border-radius:10px; padding:16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+          <p style="font-size:var(--text-base); font-weight:700; color:#2A2A2A; margin:0; line-height:1.4;">A パート</p>
+          <p style="font-size:var(--text-sm); color:#666666; margin:0; line-height:1.5;">日常の奇妙な依頼が来る。南原がオロオロする。</p>
+        </div>
+        <div style="flex-shrink:0; width:32px; display:flex; align-items:center; justify-content:center; color:#B8960C; font-size:1.3rem; font-weight:300;">→</div>
+        <div style="flex:1; background:#EDEDEA; border-radius:10px; padding:16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+          <p style="font-size:var(--text-base); font-weight:700; color:#2A2A2A; margin:0; line-height:1.4;">B パート</p>
+          <p style="font-size:var(--text-sm); color:rgba(26,26,46,.5); margin:0; line-height:1.5;">調査。サブキャラが絡んでくる。笑いのシーン。</p>
+        </div>
+        <div style="flex-shrink:0; width:32px; display:flex; align-items:center; justify-content:center; color:#B8960C; font-size:1.3rem; font-weight:300;">→</div>
+        <div style="flex:1; background:#EDEDEA; border-radius:10px; padding:16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+          <p style="font-size:var(--text-base); font-weight:700; color:#2A2A2A; margin:0; line-height:1.4;">C パート</p>
+          <p style="font-size:var(--text-sm); color:rgba(26,26,46,.5); margin:0; line-height:1.5;">事件が意外な展開を見せる。</p>
+        </div>
+        <div style="flex-shrink:0; width:32px; display:flex; align-items:center; justify-content:center; color:#B8960C; font-size:1.3rem; font-weight:300;">→</div>
+        <div style="flex:1; background:#EDEDEA; border-radius:10px; padding:16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+          <p style="font-size:var(--text-base); font-weight:700; color:#2A2A2A; margin:0; line-height:1.4;">D パート</p>
+          <p style="font-size:var(--text-sm); color:rgba(26,26,46,.5); margin:0; line-height:1.5;">井浦が「優しい嘘」の小説を書き上げる。感情的クライマックス。</p>
         </div>
       </div>
+
     </div>
   </section>
 
-  <!-- ===== P9: ストーリー② ===== -->
-  <section class="slide slide-content" style="--sp-xl:2.5rem;">
-    <div class="body">
-      <h2>ストーリー全体構成 ② 第1話後半〜エンド</h2>
-      <div class="ep-log">
-        <!-- LEFT -->
-        <div class="ep-col">
-          <div class="ep-section-title">後半：事件は動く</div>
-          <div class="ep-item"><span class="ep-num">#15</span><span>綾のケーキ｜仏壇の前でケーキを頬張る幽霊・綾。「はぁ〜ん♡最高〜♡」雨部が抱きしめようとして空振り</span></div>
-          <div class="ep-item"><span class="ep-num">#16</span><span>テレビの中継｜民間人工衛星「ほしめぐり」打ち上げ前の中継。外国人宇宙飛行士がカメラにセピア色の古い写真を見せている</span></div>
-          <div class="ep-item"><span class="ep-num">#17</span><span>緒月、窓から降臨｜「ハッ！」突然窓が開き緒月が飛び込んでくる。テーブルに仁王立ち。「井浦どこよ？シホ婆はうちの古参客だ」</span></div>
-          <div class="ep-item"><span class="ep-num">#18</span><span>霊力の秘密｜「シホ婆が旦那の夢を叶えたいって言うから写真に霊力を込めてやったんだ。だから写真は旅をしていた」</span></div>
-          <div class="ep-item"><span class="ep-num">#19</span><span>写真の発見｜テレビの宇宙飛行士が英語でインタビューに答えている。「半年前、突然この写真が落ちてきた。HAHAHA！」</span></div>
-          <div class="ep-item"><span class="ep-num">#20</span><span>南原爆発｜「は？は、は……？！写真が宇宙に持ってかれちゃいましたよぉ！！！」</span></div>
-        </div>
-        <!-- RIGHT -->
-        <div class="ep-col">
-          <div class="ep-section-title">クライマックス：屋上の真実</div>
-          <div class="ep-item"><span class="ep-num">#21</span><span>屋上の静寂｜血相を変えて駆け上がる南原。屋上には井浦一人。</span></div>
-          <div class="ep-item"><span class="ep-num">#22</span><span>シホの声（想像）｜「あの人は飛行機乗りだったからねぇ。宇宙にも飛んでいきたいと言ってたの」</span></div>
-          <div class="ep-item"><span class="ep-num">#23</span><span>夢の成就｜「もう戻らなくていいから、存分に行っといで……よかった、夢が叶って。いってらっしゃい」</span></div>
-          <div class="ep-item"><span class="ep-num">#24</span><span>井浦の正体｜手元の原稿用紙。タイトルには「星めぐりの歌」。書き上がっていた。</span></div>
-          <div class="ep-item"><span class="ep-num">#25</span><span>ニヤリ｜「南ちゃん、書き上がったよ。さ、依頼人を呼んで。」振り向いて笑う井浦。</span></div>
 
-          <div class="ep-section-title" style="margin-top:.5rem;">エンド</div>
-          <div class="ep-item"><span class="ep-num">#26</span><span>タイトル表示｜〈PENROSE 破 星めぐりの歌〉</span></div>
-
-          <div class="ep-section-title" style="margin-top:.5rem;">シリーズ今後</div>
-          <div class="ep-item"><span class="ep-num">#27</span><span>第2話以降｜毎話新しい"故人"の依頼が来る。依頼ごとに死の状況・遺族の関係・倫理的葛藤が異なる</span></div>
-          <div class="ep-item"><span class="ep-num">#28</span><span>キャラクター深掘り｜綾はなぜ成仏できないのか。緒月の過去。雨部のドローン葬は実現するのか。</span></div>
-          <div class="ep-item"><span class="ep-num">#29</span><span>井浦の謎｜なぜこの仕事を始めたのか。「優しい嘘」を書き続ける動機とは。</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== P10: シリーズ展開 ===== -->
-  <section class="slide slide-content">
-    <div class="body">
-      <h2>シリーズ展開の可能性</h2>
-      <p style="font-size:var(--text-lg);color:var(--color-muted);">1エピソード＝5〜7ショート（各1〜3分）で構成</p>
-      <div class="flow">
-        <div class="flow-step">
-          <h3>A パート</h3>
-          <p>日常の奇妙な依頼が来る。南原がオロオロする。</p>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <h3>B パート</h3>
-          <p>調査。サブキャラが絡んでくる。笑いのシーン。</p>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <h3>C パート</h3>
-          <p>事件が意外な展開を見せる。</p>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <h3>D パート</h3>
-          <p>井浦が「優しい嘘」の小説を書き上げる。感情的クライマックス。</p>
-        </div>
-      </div>
-      <div class="cols-3">
-        <div class="card card-gold">
-          <span class="tag">累積効果</span>
-          <h3>キャラクターへの愛着</h3>
-          <p>各話ゲスト故人と主要キャラの交差が積み重なり、感情移入が深まる</p>
-        </div>
-        <div class="card card-purple">
-          <span class="tag">拡散設計</span>
-          <h3>切り抜き前提の構成</h3>
-          <p>各パートが1〜3分の縦型ショートとして独立して成立。冒頭からオチまで完結</p>
-        </div>
-        <div class="card card-sepia">
-          <span class="tag">シリーズ展開</span>
-          <h3>伏線構造</h3>
-          <p>綾の成仏・緒月の過去・井浦の謎が各話に散りばめられ、シリーズとして回収される</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== P11: 切り抜き要素 ===== -->
+  <!-- ===== P13: 切り抜き要素 ===== -->
   <section class="slide slide-content">
     <div class="body">
       <h2>縦型で映えるキャラクター紹介シーン</h2>
       <div class="cols-2" style="flex:1;">
-        <!-- Scene 01 -->
         <div class="scene-card">
           <span class="sc-num">SCENE 01</span>
           <div class="sc-title">井浦の「ニヤリ」——無表情から一瞬の笑みへ</div>
           <div class="sc-body">ずっと無表情で話していた井浦が、最後に振り返ってニヤリと笑う瞬間。南原にだけ向ける表情。このギャップが「推し」の発火点になる。</div>
           <div class="sc-trigger">キャラクター推し文化との親和性◎。「はじめてニヤリが来た回」の切り抜きは高確率でバズる。</div>
         </div>
-        <!-- Scene 02 -->
         <div class="scene-card">
           <span class="sc-num">SCENE 02</span>
           <div class="sc-title">南原のリアクション三連発</div>
           <div class="sc-body">①電話線が絡まってコケる ②「は？は、は……？！」写真が宇宙へ ③「井浦さぁん！！」血相を変えて屋上へ——リアクション芸の積み重ねがキャラクターの愛着を生む。</div>
           <div class="sc-trigger">切り抜き・MAD素材としての拡散力大。「また南原がコケてる」というコメント欄文化が育つ。</div>
         </div>
-        <!-- Scene 03 -->
         <div class="scene-card">
           <span class="sc-num">SCENE 03</span>
           <div class="sc-title">クロミの無言スワイプ</div>
           <div class="sc-body">雨部の高笑いをよそに、無言でスマホを差し出すクロミ。「航空法違反」「領空侵犯」「関税法違反」……スワイプし続ける。</div>
           <div class="sc-trigger">無口キャラの「的確な一刺し」系。縦型ショートのテンポと完全一致。シリーズで繰り返すほど「今回も来た」感が加速。</div>
         </div>
-        <!-- Scene 04 -->
         <div class="scene-card">
           <span class="sc-num">SCENE 04</span>
           <div class="sc-title">緒月の窓ダイブ</div>
@@ -476,77 +1050,179 @@
     </div>
   </section>
 
-  <!-- ===== P12: 映像サンプル ===== -->
+
+  <!-- ===== P14: 映像サンプル ===== -->
   <section class="slide slide-content">
     <div class="body">
       <h2>映像サンプル——AIアニメのクオリティと世界観</h2>
-      <div class="cols-3" style="flex:1;margin-block:0;">
-        <!-- Frame 1 -->
-        <div class="video-frame" style="background:linear-gradient(135deg,#0f0e1a 0%,#1a1228 50%,#0c1018 100%);">
-          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
-          <div class="vf-label">01 / V-1776239330277</div>
+      <div class="cols-2" style="flex:1; margin-block:0;">
+        <div class="video-frame">
+          <video src="assets/sample1.mp4" controls muted style="width:100%; height:100%; object-fit:contain; display:block;"></video>
+          <div class="vf-label">01 / VIDEO SAMPLE</div>
         </div>
-        <!-- Frame 2 -->
-        <div class="video-frame" style="background:linear-gradient(155deg,#180e0a 0%,#241208 50%,#100c08 100%);">
-          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
-          <div class="vf-label">02 / V-1776239330277</div>
-        </div>
-        <!-- Frame 3 -->
-        <div class="video-frame" style="background:linear-gradient(155deg,#0a0f18 0%,#0c1822 50%,#080e14 100%);">
-          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
-          <div class="vf-label">03 / V-1776239330277</div>
-        </div>
-        <!-- Frame 4 -->
-        <div class="video-frame" style="background:linear-gradient(135deg,#141018 0%,#1c1428 50%,#100e18 100%);">
-          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
-          <div class="vf-label">04 / V-1776239350153</div>
-        </div>
-        <!-- Frame 5 -->
-        <div class="video-frame" style="background:linear-gradient(155deg,#0f1208 0%,#18200a 50%,#0c1008 100%);">
-          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
-          <div class="vf-label">05 / V-1776239350153</div>
-        </div>
-        <!-- Frame 6 -->
-        <div class="video-frame" style="background:linear-gradient(155deg,#100a10 0%,#1c1020 50%,#0e0810 100%);">
-          <div style="color:rgba(196,150,59,.35);font-size:2rem;">▶</div>
-          <div class="vf-label">06 / V-1776239350153</div>
+        <div class="video-frame">
+          <video src="assets/sample2.mp4" controls muted style="width:100%; height:100%; object-fit:contain; display:block;"></video>
+          <div class="vf-label">02 / VIDEO SAMPLE</div>
         </div>
       </div>
-      <p style="font-size:var(--text-sm);color:var(--color-muted);">「AIアニメ特有の"奇妙な質感"と"不完全な動き"が、この世とあの世の境界を自然に演出する。」</p>
+      <p style="font-size:var(--text-sm); color:var(--color-muted);">「AIアニメ特有の"奇妙な質感"と"不完全な動き"が、この世とあの世の境界を自然に演出する。」</p>
     </div>
   </section>
 
-  <!-- ===== P13: 制作体制 ===== -->
-  <section class="slide slide-content" style="--sp-xl:2.5rem;">
-    <div class="body">
-      <h2>制作体制</h2>
-      <div class="cols-2" style="flex:1;align-items:start;gap:var(--sp-xl);">
-        <!-- LEFT: production table -->
-        <table class="prod-table">
-          <tbody>
-            <tr><td>制作会社</td><td>株式会社Chammi</td></tr>
-            <tr><td>脚本原作</td><td>PENROSE（2023年）</td></tr>
-            <tr><td>監督</td><td>髙橋 果子</td></tr>
-            <tr><td>キャラクターデザイン</td><td>あらためやむ</td></tr>
-            <tr><td>プラットフォーム</td><td>縦型ショートプラットフォーム</td></tr>
-            <tr><td>制作期間</td><td>約1ヶ月</td></tr>
-          </tbody>
-        </table>
-        <!-- RIGHT: bio blocks -->
-        <div style="display:flex;flex-direction:column;gap:var(--sp-md);">
-          <div>
-            <p style="font-size:var(--text-xs);color:var(--color-accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;">監督略歴 / 髙橋 果子</p>
-            <p style="font-size:var(--text-sm);color:var(--color-muted);line-height:1.65;">宮城県出身。東北芸術工科大学 歴史遺産学科卒。NHK Eテレ「グレーテルのかまど」「人と暮らしと、台所」ディレクター。Sony「映画×ブラビア」プロモーション Dir。「こどもちゃれんじぷち」ビデオコンテンツ 監督。MV「井澤巧麻 Pure as Ice」監督・撮影・編集。自主映画「PENROSE」監督・脚本・編集（2023年11月公開）。</p>
-          </div>
-          <div>
-            <p style="font-size:var(--text-xs);color:var(--color-accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;">キャラクターデザイン / あらためやむ</p>
-            <p style="font-size:var(--text-sm);color:var(--color-muted);">パイオニアLDC・ユニバーサル・アミューズソフト等にて映像プロデューサーを歴任。現在はウェブトゥーンを中心に漫画家として活動。代表作：「もんすたっ！」「タマオのおたま」「ののちゃん」「RUN」「仔猫をもらってきた」ほか</p>
-            <p style="font-size:var(--text-xs);"><a href="https://www.pixiv.net/users/779169" target="_blank" style="color:var(--color-accent-2);">Pixiv: pixiv.net/users/779169 ↗</a></p>
-          </div>
+
+  <!-- ===== P14: 海外展開について ===== -->
+  <section class="slide slide-content" style="background:#F7F4EF !important; padding:40px 48px; gap:10px;">
+
+    <!-- タイトル行 -->
+    <div style="flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+        <span style="width:10px; height:10px; border-radius:50%; background:#B8960C; flex-shrink:0; display:inline-block;"></span>
+        <h2 style="font-size:28px; font-weight:700; color:#1C3557; margin:0; line-height:1.4;">海外展開について</h2>
+      </div>
+      <div style="height:1px; background:#B8960C; width:100%;"></div>
+    </div>
+
+    <!-- ゾーン① 結論帯 -->
+    <div style="border-left:4px solid #B8960C; background:rgba(184,150,12,.07); border-radius:0 8px 8px 0; padding:12px 24px; flex-shrink:0;">
+      <p style="font-size:14px; font-weight:700; color:#2A2A2A; margin:0; line-height:1.7;">「超常×日常×ヒューマンドラマ」の構造により、英語圏・中国双方でヒット実績のある文脈に一致する——<span style="color:#B8960C;">グローバル適性の高いオムニバス作品</span></p>
+    </div>
+
+    <!-- ゾーン② コア構造 -->
+    <div style="background:#F5F5F5; border-left:4px solid #1C3557; padding:12px 20px; flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+      <div>
+        <span style="font-size:10px; color:#1C3557; font-weight:400; letter-spacing:.1em; text-transform:uppercase; display:block; margin-bottom:3px;">コア構造</span>
+        <p style="font-size:15px; font-weight:700; color:#1A1A1A; margin:0;">死者・未練・記憶が織りなす普遍的テーマ</p>
+      </div>
+      <div style="display:flex; align-items:stretch; gap:0;">
+        <!-- 要素① -->
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; text-align:center; padding:6px 12px;">
+          <span style="font-size:10px; color:#B8960C; line-height:1;">●</span>
+          <p style="font-size:13px; font-weight:700; color:#2A2A2A; margin:0;">死者・未練・記憶</p>
+          <p style="font-size:11px; color:#666666; margin:0;">幽霊／遺品／思い出</p>
+        </div>
+        <div style="width:1px; background:#DDDDDD; align-self:stretch; flex-shrink:0;"></div>
+        <!-- 要素② -->
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; text-align:center; padding:6px 12px;">
+          <span style="font-size:10px; color:#B8960C; line-height:1;">●</span>
+          <p style="font-size:13px; font-weight:700; color:#2A2A2A; margin:0;">日常×非現実</p>
+          <p style="font-size:11px; color:#666666; margin:0;">現代社会に入り込む超常</p>
+        </div>
+        <div style="width:1px; background:#DDDDDD; align-self:stretch; flex-shrink:0;"></div>
+        <!-- 要素③ -->
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; text-align:center; padding:6px 12px;">
+          <span style="font-size:10px; color:#B8960C; line-height:1;">●</span>
+          <p style="font-size:13px; font-weight:700; color:#2A2A2A; margin:0;">1話完結・依頼型</p>
+          <p style="font-size:11px; color:#666666; margin:0;">言語依存が低い構造</p>
+        </div>
+        <div style="width:1px; background:#DDDDDD; align-self:stretch; flex-shrink:0;"></div>
+        <!-- 結論 -->
+        <div style="flex:1.4; display:flex; align-items:center; justify-content:flex-end; padding:6px 0 6px 16px;">
+          <p style="font-size:13px; font-weight:700; color:#B8960C; margin:0; text-align:right; line-height:1.5;">→ 翻訳・ローカライズ耐性が高い</p>
         </div>
       </div>
     </div>
+
+    <!-- ゾーン③④ 左右2カラム -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; flex:1; min-height:0; margin-top:32px;">
+
+      <!-- 左カラム：英語圏 -->
+      <div style="display:flex; flex-direction:column; gap:8px; min-height:0; padding:16px; box-sizing:border-box;">
+        <!-- タグ帯 -->
+        <div style="background:#B8960C; border-radius:4px; padding:6px 16px; display:inline-flex; align-items:center; gap:6px; align-self:flex-start;">
+          <span style="font-size:13px; font-weight:700; color:#fff;">🌐 英語圏</span>
+        </div>
+        <!-- ヒット文脈 -->
+        <p style="font-size:13px; color:#666666; margin:0; line-height:1.6;">死×ユーモア×エモの融合　／　1話完結・短編オムニバス構造</p>
+        <!-- サムネイル3列 -->
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; flex-shrink:0; margin-top:12px;">
+          <!-- Coco -->
+          <a href="https://www.youtube.com/results?search_query=Coco+trailer" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; gap:4px;">
+            <div style="border-radius:4px; overflow:hidden; background:#CCCCCC; height:140px; position:relative;">
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <span style="font-size:11px; color:rgba(0,0,0,.5); text-align:center; padding:4px;">Coco</span>
+              </div>
+              <img src="assets/thumb_coco.jpg" alt="Coco" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; display:block;" onerror="this.style.display='none'">
+            </div>
+            <p style="font-size:12px; color:#2A2A2A; margin:0; font-weight:700; line-height:1.3;">Coco<span style="color:#B8960C;"> ↗</span></p>
+            <p style="font-size:11px; color:#666666; margin:0;">2017 / Disney Pixar</p>
+          </a>
+          <!-- The Good Place -->
+          <a href="https://www.youtube.com/results?search_query=The+Good+Place+trailer" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; gap:4px;">
+            <div style="border-radius:4px; overflow:hidden; background:#CCCCCC; height:140px; position:relative;">
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <span style="font-size:11px; color:rgba(0,0,0,.5); text-align:center; padding:4px;">The Good Place</span>
+              </div>
+              <img src="assets/thumb_goodplace.jpg" alt="The Good Place" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; display:block;" onerror="this.style.display='none'">
+            </div>
+            <p style="font-size:12px; color:#2A2A2A; margin:0; font-weight:700; line-height:1.3;">The Good Place<span style="color:#B8960C;"> ↗</span></p>
+            <p style="font-size:11px; color:#666666; margin:0;">NBC</p>
+          </a>
+          <!-- Love Death + Robots -->
+          <a href="https://www.youtube.com/results?search_query=Love+Death+Robots+trailer" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; gap:4px;">
+            <div style="border-radius:4px; overflow:hidden; background:#CCCCCC; height:140px; position:relative;">
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <span style="font-size:11px; color:rgba(0,0,0,.5); text-align:center; padding:4px;">Love Death + Robots</span>
+              </div>
+              <img src="assets/thumb_ldr.jpg" alt="Love Death + Robots" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; display:block;" onerror="this.style.display='none'">
+            </div>
+            <p style="font-size:12px; color:#2A2A2A; margin:0; font-weight:700; line-height:1.3;">Love Death + Robots<span style="color:#B8960C;"> ↗</span></p>
+            <p style="font-size:11px; color:#666666; margin:0;">Netflix</p>
+          </a>
+        </div>
+        <!-- 適合理由 -->
+        <ul style="list-style:none; margin:16px 0 0 0; padding:0; display:flex; flex-direction:column; gap:3px; flex:1;">
+          <li style="font-size:13px; color:#666666; line-height:1.6;">・重くなりがちな"死"をポップに扱う構造が一致</li>
+          <li style="font-size:13px; color:#666666; line-height:1.6;">・短尺・切り抜き・SNS拡散に適したフォーマット</li>
+          <li style="font-size:13px; color:#666666; line-height:1.6;">・ビジュアル中心の演出により言語を越えて理解可能</li>
+        </ul>
+      </div>
+
+      <!-- 右カラム：中国語圏 -->
+      <div style="display:flex; flex-direction:column; gap:8px; min-height:0; padding:16px; box-sizing:border-box;">
+        <!-- タグ帯 -->
+        <div style="background:#6B5B8F; border-radius:4px; padding:6px 16px; display:inline-flex; align-items:center; gap:6px; align-self:flex-start;">
+          <span style="font-size:13px; font-weight:700; color:#fff;">🇨🇳 中国語圏</span>
+        </div>
+        <!-- ヒット文脈 -->
+        <p style="font-size:13px; color:#666666; margin:0; line-height:1.6;">情緒（エモ）×死生観×記憶　／　現代×超常の融合</p>
+        <!-- サムネイル2列 -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; flex-shrink:0; margin-top:12px;">
+          <!-- 時光代理人 -->
+          <a href="https://www.youtube.com/results?search_query=Link+Click+trailer" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; gap:4px;">
+            <div style="border-radius:4px; overflow:hidden; background:#CCCCCC; height:140px; position:relative;">
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <span style="font-size:11px; color:rgba(0,0,0,.5); text-align:center; padding:4px;">時光代理人</span>
+              </div>
+              <img src="assets/thumb_linkclick.jpg" alt="時光代理人" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; display:block;" onerror="this.style.display='none'">
+            </div>
+            <p style="font-size:12px; color:#2A2A2A; margin:0; font-weight:700; line-height:1.3;">時光代理人 / Link Click<span style="color:#6B5B8F;"> ↗</span></p>
+            <p style="font-size:11px; color:#666666; margin:0;">2021</p>
+          </a>
+          <!-- 天官賜福 -->
+          <a href="https://www.youtube.com/results?search_query=Heaven+Official+Blessing+trailer" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; gap:4px;">
+            <div style="border-radius:4px; overflow:hidden; background:#CCCCCC; height:140px; position:relative;">
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <span style="font-size:11px; color:rgba(0,0,0,.5); text-align:center; padding:4px;">天官賜福</span>
+              </div>
+              <img src="assets/thumb_heaven.jpg" alt="天官賜福" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; display:block;" onerror="this.style.display='none'">
+            </div>
+            <p style="font-size:12px; color:#2A2A2A; margin:0; font-weight:700; line-height:1.3;">天官賜福 / Heaven Official's Blessing<span style="color:#6B5B8F;"> ↗</span></p>
+            <p style="font-size:11px; color:#666666; margin:0;">2020</p>
+          </a>
+        </div>
+        <!-- 適合理由 -->
+        <ul style="list-style:none; margin:16px 0 0 0; padding:0; display:flex; flex-direction:column; gap:3px; flex:1;">
+          <li style="font-size:13px; color:#666666; line-height:1.6;">・「亡き人の記憶」「未練」というテーマが強い共感を生む</li>
+          <li style="font-size:13px; color:#666666; line-height:1.6;">・時間・記憶・運命を扱う構造が一致</li>
+          <li style="font-size:13px; color:#666666; line-height:1.6;">・感情消費型コンテンツとして拡散しやすい</li>
+        </ul>
+      </div>
+
+    </div>
+
   </section>
+
+
 
 </div><!-- /.deck -->
 
