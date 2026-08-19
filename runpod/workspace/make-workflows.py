@@ -184,18 +184,14 @@ def patch(workflow: dict, preset: dict, user: str, mode: str,
     # Duration(秒) は数式ノード経由でフレーム数になる
     set_widget(TITLE_DURATION, 0, preset["duration"], "長さ(秒)")
 
-    # 保存先。SaveVideo の filename_prefix は通常のウィジェットなので直接書ける。
-    # seed は実際に seed / noise_seed を持つノードのタイトルを参照する。
-    seed_token = ""
-    for n in nodes:
-        names = widget_order(object_info, n.get("type", ""))
-        for cand in ("seed", "noise_seed"):
-            if cand in names:
-                seed_token = f"_%{n.get('title') or n.get('type')}.{cand}%"
-                break
-        if seed_token:
-            break
-    prefix = f"{user}/{mode}/%date:yyyyMMdd_hhmmss%_{user}_{mode}{seed_token}"
+    # 保存先。
+    # 注意: %date:...% は ComfyUI v0.33 の SaveVideo では展開されず、
+    # %ノード名.ウィジェット% はフロントエンド専用で API 経由では解決されない。
+    # そのためトークンは使わず、プレーンな prefix にする。
+    # ComfyUI が末尾に連番（_00001_）を付ける。
+    # 日時と seed を含む命名が必要な場合は queue-workflow.py から投入すると、
+    # 投入時に実際の値を埋めた prefix に差し替わる。
+    prefix = f"{user}/{mode}/{user}_{mode}"
 
     saved = False
     for n in nodes:

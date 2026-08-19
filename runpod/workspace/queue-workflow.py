@@ -114,6 +114,8 @@ def main() -> int:
     ap.add_argument("--prompt", help="生成プロンプト（最初の正のテキスト入力を差し替える）")
     ap.add_argument("--seed", type=int)
     ap.add_argument("--no-wait", action="store_true")
+    ap.add_argument("--no-stamp", action="store_true",
+                    help="保存名に日時と seed を埋め込まない")
     ap.add_argument("--timeout", type=int, default=1800)
     args = ap.parse_args()
 
@@ -146,6 +148,34 @@ def main() -> int:
                 print(f"[queue] CLIPTextEncode(node {nid}).text -> {args.prompt!r}")
                 inp["text"] = args.prompt
                 break
+
+    # 保存名を YYYYMMDD_HHMMSS_<user>_<mode>_<seed>.mp4 の規則に合わせる。
+    # ComfyUI 側のトークン展開に頼れないので、ここで実値を埋める。
+    if not args.no_stamp:
+        seed_val = args.seed
+        if seed_val is None:
+            for node in prompt.values():
+                for k in ("noise_seed", "seed"):
+                    v = node["inputs"].get(k)
+                    if isinstance(v, int):
+                        seed_val = v
+                        break
+                if seed_val is not None:
+                    break
+        ts = time.strftime("%Y%m%d_%H%M%S")
+        for nid, node in prompt.items():
+            if not node["class_type"].startswith(("SaveVideo", "SaveWEBM", "SaveAnimated")):
+                continue
+            cur = node["inputs"].get("filename_prefix")
+            if not isinstance(cur, str):
+                continue
+            d, _, base = cur.rpartition("/")
+            base = base or "output"
+            new_prefix = f"{d}/{ts}_{base}" if d else f"{ts}_{base}"
+            if seed_val is not None:
+                new_prefix += f"_{seed_val}"
+            print(f"[queue] 保存名: {cur} -> {new_prefix}")
+            node["inputs"]["filename_prefix"] = new_prefix
 
     try:
         res = api_post("/prompt", {"prompt": prompt})
