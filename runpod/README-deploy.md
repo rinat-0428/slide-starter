@@ -310,6 +310,101 @@ bash /workspace/record-environment.sh
 
 ---
 
+## 実機で判明した仕様（重要）
+
+構築中に踏んだ落とし穴です。次に触る人が同じ所で止まらないよう残します。
+
+### 1. パラメータはコントロールノードから供給されている
+
+公式テンプレートは `width` / `height` / `length` / `steps` を、
+**対象ノードのウィジェットではなく専用のコントロールノードからのリンク**で供給します。
+
+```
+Boolean (Enable Lightning LoRA) ─┬→ If/Else Switch (model) → UNet か LoRA 経路
+                                 └→ If/Else Switch (Steps) → 4 か 20
+Resolution Selector (Size)       → width / height
+Float (Duration)                 → 数式ノード → length（フレーム数）
+Input Text (Prompt)              → prompt
+```
+
+**生成ノード側の数値を書き換えても一切効きません。** 必ず上記を触ること。
+`make-workflows.py` はノードのタイトルでこれらを特定して書き換えます。
+
+megapixels と解像度の対応（16:9 / multiple=32、テンプレート同梱の表より）:
+
+| megapixels | 解像度 |
+|---|---|
+| 0.2 | 608 × 352 |
+| 0.4 | 864 × 480 |
+| 0.7 | 1152 × 640 |
+| 0.9 | 1280 × 736 |
+
+### 2. Turbo (Lightning) LoRA が必須
+
+公式テンプレートは LoRA ノードを含むため、ファイルが無いと
+`lora_name: not in []` で検証落ちします。`setup.sh` が3本取得します。
+
+| ファイル | 用途 |
+|---|---|
+| `minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors` | r2v（今回のメイン） |
+| `minimax_h3_fl2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors` | fl2v |
+| `minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors` | fl2v |
+
+既定では **Lightning LoRA は OFF**（= 20 steps のフルモデル）です。
+Preview 用に `make-workflows.py` が ON（4 steps）に切り替えます。
+
+### 3. ファイル名のトークンは使えない
+
+- `%date:...%` は v0.33 の SaveVideo では展開されない
+- `%ノード名.ウィジェット%` はフロントエンド専用で API 経由では解決されない
+
+そのため prefix はプレーンにし、日時と seed が必要な場合は
+`queue-workflow.py` が投入時に実値を埋めます。
+
+### 4. ComfyUI のバージョンとテンプレートの置き場所
+
+- 実機は **ComfyUI v0.33.0**
+- テンプレートの実体は `comfyui_workflow_templates_json`（`_json` 付き）にある
+  （`comfyui_workflow_templates` は空のシムになっている）
+- `api_minimax_h3_*.json` は **MiniMax のクラウド API を叩く**テンプレート。
+  ローカル推論では使わない（`make-workflows.py` が除外する）
+- `/object_info` では COMBO が文字列 `"COMBO"` で返り、
+  `SaveVideo.codec` は `COMFY_DYNAMICCOMBO_V3` という派生型
+
+### 5. 実測値（H100 80GB / AP-JP-1）
+
+| | Preview | Quality |
+|---|---|---|
+| 設定 | Lightning ON / 4 steps / 608×352 / 3秒 | Full / 20 steps / 1280×736 / 5秒 |
+| 生成時間 | **約5秒**（VRAM常駐時） | 約8分 |
+| VRAM | 約42GB | 約42GB |
+
+初回はモデルのVRAMロードで数分かかります。
+
+---
+
+## ブラウザから ComfyUI が開けない場合
+
+RunPod のプロキシ（`https://<podid>-8188.proxy.runpod.net`）は正常でも、
+ブラウザによっては開けないことがあります。まず外部から確認してください。
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" https://<podid>-8188.proxy.runpod.net/
+```
+
+200 が返るならプロキシは正常です。別ブラウザ、またはシークレットウィンドウを試してください。
+
+ブラウザを使わずに生成テストしたい場合は `queue-workflow.py` を使います。
+
+```bash
+python3 /workspace/queue-workflow.py --workflow /workspace/workflows/h3_preview.json --image test_ref.png --prompt "..."
+```
+
+UI 形式のワークフローを API 形式へ変換して `/prompt` に投げるので、
+Pod 再作成後の疎通確認にもそのまま使えます。
+
+---
+
 ## 注意点 / 既知のリスク
 
 ### ワークフロー生成は「公式テンプレートの書き換え」方式
