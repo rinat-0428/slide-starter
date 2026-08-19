@@ -167,7 +167,62 @@ Stop しても以下は残ります:
 
 ---
 
-## 5. 設定を変えるときの注意
+## 5. リファレンス画像の枚数を変える
+
+このテンプレートは**リファレンス画像を0枚から何枚でも**受け付けます
+（`ref_images` が可変長の入力グループになっているため）。
+既定は2枚ですが、用途に合わせて作り直せます。
+
+```bash
+# 1枚だけ（キャラ1体を参照）
+python3 /workspace/make-workflows.py --user yasu --refs 1 --ref-images achan.png
+
+# 3枚（キャラ + 背景 + 小物 など）
+python3 /workspace/make-workflows.py --user yasu --refs 3 --ref-images achan.png bg.png prop.png
+
+# 枚数だけ決めて、画像は UI で選ぶ
+python3 /workspace/make-workflows.py --user yasu --refs 1
+
+# プロンプトも一緒に入れる
+python3 /workspace/make-workflows.py --user yasu --refs 1 --ref-images achan.png \
+  --prompt "Aちゃんが振り向いて笑う。カメラはゆっくり寄る"
+```
+
+画像ファイルは ComfyUI の input ディレクトリ（`/workspace/input/`）に置いたものを名前で指定します。
+UI からアップロードした画像もここに入ります。
+
+### プロンプトからの参照のしかた（重要）
+
+プロンプト内では **`<Picture 1>` `<Picture 2>` …** で「何枚目の画像か」を指定します。
+番号は **1始まり**です。
+
+| ノード | プロンプトでの呼び名 |
+|--------|----------------------|
+| 1つ目の「画像を読み込む」 | `<Picture 1>` |
+| 2つ目の「画像を読み込む」 | `<Picture 2>` |
+| 3つ目 | `<Picture 3>` |
+
+書き方の例:
+
+```
+Use <Picture 1> as the character reference and <Picture 2> as the background.
+<Picture 1> の人物が振り向いて笑う。カメラはゆっくり寄る。
+```
+
+**枚数を減らしたら、プロンプト側の `<Picture N>` も必ず直してください。**
+存在しない画像を指すと意図しない結果になります。
+テンプレート付属の初期プロンプトは `<Picture 1>` と `<Picture 2>` を参照しているので、
+1枚に減らす場合は `<Picture 2>` の記述を消す必要があります。
+
+### 0枚にする場合
+
+`--refs 0` でリファレンスなしにできますが、**r2v モデルでの動作は未検証**です。
+テキストだけから作りたい場合は、ComfyUI のテンプレート一覧にある
+**t2v（text-to-video）** のテンプレートを使う方が確実です。
+
+---
+
+## 6. 設定を変えるときの注意
 
 解像度・長さ・steps は、**Save Video や生成ノードの数字を直接いじっても効きません。**
 これらは専用のコントロールノードから供給されています。次のノードを触ってください。
@@ -181,7 +236,7 @@ Stop しても以下は残ります:
 
 ---
 
-## 6. 困ったときは
+## 7. 困ったときは
 
 ### ComfyUI の画面が開かない
 
@@ -231,7 +286,7 @@ ls -lh /workspace/outputs/<あなたの名前>/preview/
 
 ---
 
-## 7. フォルダ構成
+## 8. フォルダ構成
 
 ```
 /workspace/
@@ -259,7 +314,7 @@ ls -lh /workspace/outputs/<あなたの名前>/preview/
 
 ---
 
-## 8. 管理者向けメモ
+## 9. 管理者向けメモ
 
 - 初回セットアップ: `bash /workspace/setup.sh`
 - 自動起動の設定: Pod の **Container Start Command** に

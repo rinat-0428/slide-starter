@@ -61,6 +61,7 @@ PRESETS = {
 TITLE_LIGHTNING = "Boolean (Enable Lightning LoRA)"
 TITLE_RESOLUTION = "Resolution Selector (Size)"
 TITLE_DURATION = "Float (Duration)"
+TITLE_PROMPT = "Input Text (Prompt)"
 
 SAVE_NODE_TYPES = re.compile(r"(SaveVideo|SaveWEBM|SaveAnimated|VHS_VideoCombine)", re.I)
 
@@ -150,8 +151,103 @@ def widget_order(object_info: dict | None, node_type: str) -> list[str]:
 # ---------------------------------------------------------------------------
 # 書き換え
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# リファレンス画像の枚数を変える
+# ---------------------------------------------------------------------------
+REF_NODE_TYPE = "MiniMaxH3ReferenceToVideo"
+REF_SLOT_PREFIX = "ref_images.ref_image_"
+
+
+def set_reference_images(workflow: dict, count: int,
+                         filenames: list[str]) -> tuple[list[str], list[str]]:
+    """リファレンス画像を count 枚に作り替える。
+
+    MiniMaxH3ReferenceToVideo の ref_images は可変長のオプション入力グループで、
+    `ref_images.ref_image_0`, `_1`, ... という名前のスロットが並ぶ。
+    公式テンプレートは 2 枚つないだ状態で出荷され、末尾に空きスロットが 1 つある
+    （ComfyUI の UI が「次の1つ」を常に空けておくため）。ここでも同じ形に揃える。
+
+    リンクの target_slot は inputs 配列の「位置」なので、スロットを増減したら
+    後続のリンクの位置を補正しないとグラフが壊れる。そこも面倒を見る。
+    """
+    changes: list[str] = []
+    warnings: list[str] = []
+    nodes = workflow.get("nodes", [])
+    links = workflow.get("links", [])
+
+    target = next((n for n in nodes if n.get("type") == REF_NODE_TYPE), None)
+    if target is None:
+        warnings.append(f"  !! {REF_NODE_TYPE} が見つかりません。枚数変更をスキップします")
+        return changes, warnings
+
+    tid = target["id"]
+    inputs = target.get("inputs") or []
+    idxs = [i for i, inp in enumerate(inputs)
+            if str(inp.get("name", "")).startswith(REF_SLOT_PREFIX)]
+    if not idxs:
+        warnings.append("  !! ref_images スロットが見つかりません")
+        return changes, warnings
+
+    start, old_n = idxs[0], len(idxs)
+    old_connected = sum(1 for i in idxs if inputs[i].get("link") is not None)
+
+    # 既存のリンクと、それを供給していた LoadImage を取り除く
+    old_link_ids = {inputs[i]["link"] for i in idxs if inputs[i].get("link") is not None}
+    src_ids = {l[1] for l in links
+               if isinstance(l, list) and len(l) >= 2 and l[0] in old_link_ids}
+    links[:] = [l for l in links if not (isinstance(l, list) and l and l[0] in old_link_ids)]
+    removed = [n for n in nodes if n.get("id") in src_ids and n.get("type") == "LoadImage"]
+    ref_pos = removed[0].get("pos", [-700, 5600]) if removed else [-700, 5600]
+    nodes[:] = [n for n in nodes if n not in removed]
+
+    # スロットを count + 1 個に作り替える（末尾の1つは空き）
+    want = count + 1
+    inputs[start:start + old_n] = [
+        {"label": f"ref_image_{i}", "name": f"{REF_SLOT_PREFIX}{i}",
+         "shape": 7, "type": "IMAGE", "link": None}
+        for i in range(want)
+    ]
+
+    # スロット数が変わった分だけ、後続スロットを指すリンクの位置を補正
+    delta = want - old_n
+    if delta:
+        for l in links:
+            if isinstance(l, list) and len(l) >= 5 and l[3] == tid and l[4] >= start + old_n:
+                l[4] += delta
+
+    # 新しい LoadImage を作ってつなぐ
+    next_node_id = max([n.get("id", 0) for n in nodes], default=0) + 1
+    next_link_id = max([l[0] for l in links if isinstance(l, list) and l], default=0) + 1
+    for i in range(count):
+        nid, lid = next_node_id + i, next_link_id + i
+        fname = filenames[i] if i < len(filenames) else ""
+        nodes.append({
+            "id": nid, "type": "LoadImage",
+            "pos": [ref_pos[0], ref_pos[1] + i * 360],
+            "size": [290, 330], "flags": {}, "order": 0, "mode": 0,
+            "inputs": [],
+            "outputs": [{"name": "IMAGE", "type": "IMAGE", "links": [lid]},
+                        {"name": "MASK", "type": "MASK", "links": None}],
+            "properties": {"cnr_id": "comfy-core", "ver": "0.33.0",
+                           "Node name for S&R": "LoadImage"},
+            "widgets_values": [fname, "image"],
+            "widgets_values_named": {"image": fname, "upload": "image"},
+        })
+        links.append([lid, nid, 0, tid, start + i, "IMAGE"])
+        inputs[start + i]["link"] = lid
+
+    label = "、".join(filenames[:count]) if filenames else "未選択（UI で選ぶ）"
+    changes.append(f"  リファレンス画像: {old_connected}枚 -> {count}枚  ({label})")
+    if count == 0:
+        warnings.append("  ※ 0枚はリファレンスなしの生成になります。"
+                        "r2v モデルでの動作は未検証です（text-to-video なら t2v テンプレートを推奨）")
+    return changes, warnings
+
 def patch(workflow: dict, preset: dict, user: str, mode: str,
-          object_info: dict | None) -> tuple[list[str], list[str]]:
+          object_info: dict | None, refs: int | None = None,
+          ref_images: list[str] | None = None,
+          prompt_text: str | None = None) -> tuple[list[str], list[str]]:
     changes: list[str] = []
     warnings: list[str] = []
     nodes = workflow.get("nodes", [])
@@ -176,6 +272,23 @@ def patch(workflow: dict, preset: dict, user: str, mode: str,
         if old != value:
             wv[index] = value
             changes.append(f"  {label}: {old} -> {value}   ({title})")
+
+    # リファレンス画像の枚数（指定されたときだけ触る）
+    if refs is not None:
+        c, w = set_reference_images(workflow, refs, ref_images or [])
+        changes += c
+        warnings += w
+
+    # プロンプト
+    if prompt_text is not None:
+        n = by_title.get(TITLE_PROMPT)
+        if n is None:
+            warnings.append(f"  !! {TITLE_PROMPT!r} が見つかりません（プロンプト未設定）")
+        else:
+            wv = n.get("widgets_values")
+            if isinstance(wv, list) and wv:
+                wv[0] = prompt_text
+                changes.append(f"  プロンプト: 設定しました（{len(prompt_text)}文字）")
 
     # Lightning LoRA の ON/OFF がモデル経路と steps を同時に切り替える
     set_widget(TITLE_LIGHTNING, 0, preset["lightning"], "Lightning LoRA")
@@ -219,6 +332,11 @@ def main() -> int:
     ap.add_argument("--user", default=os.environ.get("H3_USER", "shared"))
     ap.add_argument("--template")
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--refs", type=int, metavar="N",
+                    help="リファレンス画像の枚数 (0 以上)。省略時はテンプレートのまま(2枚)")
+    ap.add_argument("--ref-images", nargs="*", default=None, metavar="FILE",
+                    help="リファレンス画像のファイル名（ComfyUI の input ディレクトリ内）")
+    ap.add_argument("--prompt", help="プロンプト（Input Text (Prompt) を差し替える）")
     args = ap.parse_args()
 
     templates = find_templates()
@@ -253,7 +371,9 @@ def main() -> int:
     had_warning = False
     for mode, preset in PRESETS.items():
         wf = copy.deepcopy(base)
-        changes, warnings = patch(wf, preset, args.user, mode, object_info)
+        changes, warnings = patch(wf, preset, args.user, mode, object_info,
+                                  refs=args.refs, ref_images=args.ref_images,
+                                  prompt_text=args.prompt)
         dest = os.path.join(OUT_DIR, f"h3_{mode}.json")
         with open(dest, "w", encoding="utf-8") as f:
             json.dump(wf, f, ensure_ascii=False, indent=2)
