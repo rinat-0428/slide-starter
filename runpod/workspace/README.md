@@ -167,58 +167,154 @@ Stop しても以下は残ります:
 
 ---
 
-## 5. リファレンス画像の枚数を変える
+## 5. リファレンス画像を何枚つけるか
 
-このテンプレートは**リファレンス画像を0枚から何枚でも**受け付けます
-（`ref_images` が可変長の入力グループになっているため）。
-既定は2枚ですが、用途に合わせて作り直せます。
+このワークフローは**リファレンス画像を0枚から何枚でも**受け付けます。
+既定は**2枚**です。用途に合わせて変えてください。
 
-```bash
-# 1枚だけ（キャラ1体を参照）
-python3 /workspace/make-workflows.py --user yasu --refs 1 --ref-images achan.png
+| 枚数 | よくある用途 |
+|------|--------------|
+| 1枚 | キャラを1体だけ参照させる |
+| 2枚（既定） | キャラ + 背景 / 2カット目の指定 など |
+| 3枚以上 | キャラ + 背景 + 小物、複数キャラ など |
 
-# 3枚（キャラ + 背景 + 小物 など）
-python3 /workspace/make-workflows.py --user yasu --refs 3 --ref-images achan.png bg.png prop.png
+### 先に: 画像の置き場所
 
-# 枚数だけ決めて、画像は UI で選ぶ
-python3 /workspace/make-workflows.py --user yasu --refs 1
+リファレンス画像は ComfyUI の **input フォルダ**に入っている必要があります。
 
-# プロンプトも一緒に入れる
-python3 /workspace/make-workflows.py --user yasu --refs 1 --ref-images achan.png \
-  --prompt "Aちゃんが振り向いて笑う。カメラはゆっくり寄る"
+```
+/workspace/input/
 ```
 
-画像ファイルは ComfyUI の input ディレクトリ（`/workspace/input/`）に置いたものを名前で指定します。
-UI からアップロードした画像もここに入ります。
+**UI からアップロードすれば自動でここに入ります**（「画像を読み込む」ノードの
+`アップロードするファイルを選択` ボタン）。Jupyter のファイルブラウザから
+`/workspace/input/` に直接置いてもOKです。
 
-### プロンプトからの参照のしかた（重要）
+---
 
-プロンプト内では **`<Picture 1>` `<Picture 2>` …** で「何枚目の画像か」を指定します。
+### ケースA: 1枚だけ使う
+
+**方法1: ターミナルで作り直す（かんたん）**
+
+```bash
+python3 /workspace/make-workflows.py --user yasu --refs 1 --ref-images achan.png
+```
+
+**方法2: UI だけで済ませる**
+
+1. ワークフローを開く
+2. 「画像を読み込む」ノードが**2つ**あるので、**2つ目を選択して Delete キー**で削除
+3. 残った1つに画像をセット
+4. **プロンプトから `<Picture 2>` の記述を消す**（下の「プロンプトの書き方」参照）
+
+> 削除せずに、**2つとも同じ画像**を入れる手もあります。いちばん手数が少ないですが、
+> モデルには「同じ画像が2枚」と伝わるので、厳密に1枚にしたいなら削除してください。
+
+---
+
+### ケースB: 2枚使う（既定・そのまま使える）
+
+作り直し不要です。ワークフローを開いて、**2つの「画像を読み込む」ノードに
+それぞれ画像をセット**するだけです。
+
+ターミナルから画像も指定してしまう場合:
+
+```bash
+python3 /workspace/make-workflows.py --user yasu --refs 2 --ref-images achan.png bg.png
+```
+
+---
+
+### ケースC: 3枚以上使う
+
+**方法1: ターミナルで作り直す（推奨）**
+
+```bash
+# 3枚
+python3 /workspace/make-workflows.py --user yasu --refs 3 \
+  --ref-images achan.png bg.png prop.png
+
+# 4枚
+python3 /workspace/make-workflows.py --user yasu --refs 4 \
+  --ref-images a.png b.png c.png d.png
+```
+
+必要な数の「画像を読み込む」ノードが自動で作られ、正しい入力につながります。
+
+**方法2: UI で1つずつ足す**
+
+`MiniMax H3 Reference To Video` ノードの入力側を見ると、
+使っていない **`ref_image_2`** という空きスロットがあります（常に1つ空いています）。
+
+1. キャンバスの何もない所を**ダブルクリック** → 検索窓に `Load Image` と入力して追加
+2. 追加した「画像を読み込む」の **IMAGE 出力**から、
+   `ref_image_2` の**入力の丸**へドラッグしてつなぐ
+3. つなぐと、その下に新しい空きスロット `ref_image_3` が自動で増えます
+4. 4枚目以降も同じ繰り返し
+
+> 画像を指定するだけならターミナルの方が速くて確実です。
+> UI で足すのは、既に作業中のワークフローに1枚だけ追加したいときに向いています。
+
+---
+
+### プロンプトの書き方（枚数を変えたら必ず読む）
+
+プロンプトの中では **`<Picture 1>` `<Picture 2>` …** で「何枚目の画像か」を指します。
 番号は **1始まり**です。
 
-| ノード | プロンプトでの呼び名 |
-|--------|----------------------|
+| ノードの並び順 | プロンプトでの呼び名 |
+|----------------|----------------------|
 | 1つ目の「画像を読み込む」 | `<Picture 1>` |
-| 2つ目の「画像を読み込む」 | `<Picture 2>` |
+| 2つ目 | `<Picture 2>` |
 | 3つ目 | `<Picture 3>` |
 
 書き方の例:
 
 ```
-Use <Picture 1> as the character reference and <Picture 2> as the background.
-<Picture 1> の人物が振り向いて笑う。カメラはゆっくり寄る。
+<Picture 1> の人物が振り向いて笑う。背景は <Picture 2> の場所。
+カメラはゆっくり寄る。
 ```
 
-**枚数を減らしたら、プロンプト側の `<Picture N>` も必ず直してください。**
-存在しない画像を指すと意図しない結果になります。
-テンプレート付属の初期プロンプトは `<Picture 1>` と `<Picture 2>` を参照しているので、
-1枚に減らす場合は `<Picture 2>` の記述を消す必要があります。
+```
+Use <Picture 1> as the character reference and <Picture 2> as the background.
+```
 
-### 0枚にする場合
+**⚠ 枚数を減らしたら、プロンプトの `<Picture N>` も必ず直してください。**
 
-`--refs 0` でリファレンスなしにできますが、**r2v モデルでの動作は未検証**です。
-テキストだけから作りたい場合は、ComfyUI のテンプレート一覧にある
-**t2v（text-to-video）** のテンプレートを使う方が確実です。
+テンプレート付属の初期プロンプトは `<Picture 1>` と `<Picture 2>` の**両方**を
+参照しています。1枚に減らしたのに `<Picture 2>` が残っていると、
+存在しない画像を指すことになり、結果が意図しないものになります。
+
+ターミナルから同時に指定してしまうのが確実です。
+
+```bash
+python3 /workspace/make-workflows.py --user yasu --refs 1 --ref-images achan.png \
+  --prompt "<Picture 1> の人物が振り向いて笑う。カメラはゆっくり寄る"
+```
+
+---
+
+### 0枚にしたい場合
+
+`--refs 0` で作れますが、**このワークフロー（r2v）での動作は未検証**です。
+テキストだけから作りたい場合は、ComfyUI の **テンプレート** 一覧にある
+**t2v（text-to-video）** を使う方が確実です。
+
+---
+
+### コマンド早見表
+
+| やりたいこと | コマンド |
+|--------------|----------|
+| 1枚 | `--refs 1 --ref-images a.png` |
+| 2枚 | `--refs 2 --ref-images a.png b.png` |
+| 3枚 | `--refs 3 --ref-images a.png b.png c.png` |
+| 枚数だけ変えて画像はUIで選ぶ | `--refs 3` |
+| プロンプトも一緒に | `--prompt "..."` |
+| 自分用フォルダに出す | `--user yasu` |
+
+すべて `python3 /workspace/make-workflows.py` に付けます。
+作り直すと `h3_preview` と `h3_quality` の**両方**が更新されます。
 
 ---
 
