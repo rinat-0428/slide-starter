@@ -244,13 +244,15 @@ H3_VARIANTS="ref2va" H3_DIT_QUANT="int8_convrot" bash /workspace/setup.sh
 | `H3_DIT_QUANT` | `pruned_int8_convrot` (19.5GB) | `int8_convrot` (31.7GB) / `bf16` (61.7GB) |
 | `H3_TE_QUANT` | `nvfp4_awq` (14.6GB) | `int8_convrot` (25.3GB) / `bf16` (48.0GB) |
 
-### Step 4. 自動起動を設定
+### Step 4. 自動起動を設定（実機で設定・検証済み）
 
 Pod の設定 → **Container Start Command** を次に変更します。
 
 ```
 bash -lc 'mkdir -p /workspace/logs; nohup bash /workspace/start-comfyui.sh >> /workspace/logs/boot.log 2>&1 & exec /start.sh'
 ```
+
+実機で `PID1: /sbin/docker-init -- /opt/nvidia/nvidia_entrypoint.sh /start.sh` を確認済みです。
 
 **`exec /start.sh` を必ず残してください。** これはテンプレート本来の
 エントリポイント（sshd / JupyterLab / RunPod agent）です。ここを消して
