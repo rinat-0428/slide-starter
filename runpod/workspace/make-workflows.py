@@ -22,6 +22,7 @@ import glob
 import json
 import os
 import re
+import shutil
 import sys
 import urllib.request
 
@@ -279,7 +280,20 @@ def main() -> int:
         if not changes:
             print("  ⚠ 何も書き換えられませんでした。UI で steps / 解像度 / 保存先を手動確認してください。")
 
-    print("\n[make-workflows] 完了。ComfyUI の Workflow > Open から読み込んでください。")
+    # ComfyUI のワークフロー一覧（左サイドバー）からワンクリックで開けるように複製する。
+    # チームがファイルパスを打たずに済むので、運用上ここが効く。
+    ui_dir = os.path.join(COMFY, "user", "default", "workflows")
+    try:
+        os.makedirs(ui_dir, exist_ok=True)
+        for mode in PRESETS:
+            src = os.path.join(OUT_DIR, f"h3_{mode}.json")
+            dst = os.path.join(ui_dir, f"h3_{mode}.json")
+            shutil.copyfile(src, dst)
+        print(f"[make-workflows] ✓ ComfyUI のワークフロー一覧にも配置: {ui_dir}")
+    except OSError as e:
+        print(f"[make-workflows] ⚠ ComfyUI 側への配置に失敗: {e}")
+
+    print("\n[make-workflows] 完了。ComfyUI 左サイドバーの Workflows から開けます。")
     print(f"[make-workflows] 出力先: /workspace/outputs/{args.user}/preview|quality/")
     return 0
 
