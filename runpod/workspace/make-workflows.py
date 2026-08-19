@@ -54,7 +54,6 @@ WIDGET_ALIASES = {
 }
 
 SAVE_NODE_TYPES = re.compile(r"(SaveVideo|SaveWEBM|SaveAnimated|VHS_VideoCombine|SaveAudio)", re.I)
-SAMPLER_NODE_TYPES = re.compile(r"Sampler", re.I)
 
 
 # ---------------------------------------------------------------------------
@@ -138,11 +137,20 @@ def widget_order(object_info: dict | None, node_type: str) -> list[str]:
     names: list[str] = []
     for group in ("required", "optional"):
         for name, meta in (spec.get(group) or {}).items():
-            # リンク接続専用（MODEL/LATENT等）はウィジェットにならない
+            # リンク接続専用（MODEL/LATENT/IMAGE等）はウィジェットにならない。
+            # ウィジェットになるのは以下:
+            #   - 選択肢リスト（COMBO）
+            #       旧形式: ["euler","dpmpp_2m",...] というリスト
+            #       新形式(v0.33): 文字列 "COMBO"（選択肢は別フィールド）
+            #   - INT / FLOAT / STRING / BOOLEAN
+            # ここを取りこぼすと widgets_values のインデックスがずれ、
+            # 別のウィジェットを踏み潰すので必ず両形式を見る。
             t = meta[0] if isinstance(meta, (list, tuple)) and meta else meta
-            if isinstance(t, list):          # COMBO
+            if isinstance(t, list):
                 names.append(name)
-            elif isinstance(t, str) and t in ("INT", "FLOAT", "STRING", "BOOLEAN"):
+            elif isinstance(t, dict):
+                names.append(name)
+            elif isinstance(t, str) and t in ("COMBO", "INT", "FLOAT", "STRING", "BOOLEAN"):
                 names.append(name)
     return names
 
@@ -156,12 +164,20 @@ def patch(workflow: dict, preset: dict, user: str, mode: str, object_info: dict 
 
     # 保存先: /workspace/outputs/<user>/<mode>/YYYYMMDD_HHMMSS_<user>_<mode>_<seed>
     # ComfyUI の filename_prefix は %date:...% と %NodeTitle.widget% を展開できる
-    sampler_title = None
+    # seed をファイル名に埋めるため、実際に seed ウィジェットを持つノードを探す。
+    # "Sampler" を名前で拾うと KSamplerSelect（seed を持たない）を掴んでしまうので、
+    # ノード定義から seed / noise_seed を実際に持つものだけを対象にする。
+    seed_token = ""
     for n in nodes:
-        if SAMPLER_NODE_TYPES.search(n.get("type", "")):
-            sampler_title = n.get("title") or n.get("type")
+        ntype = n.get("type", "")
+        names = widget_order(object_info, ntype)
+        for cand in ("seed", "noise_seed"):
+            if cand in names:
+                title = n.get("title") or ntype
+                seed_token = f"_%{title}.{cand}%"
+                break
+        if seed_token:
             break
-    seed_token = f"_%{sampler_title}.seed%" if sampler_title else ""
     prefix = f"{user}/{mode}/%date:yyyyMMdd_hhmmss%_{user}_{mode}{seed_token}"
 
     for n in nodes:
@@ -173,14 +189,23 @@ def patch(workflow: dict, preset: dict, user: str, mode: str, object_info: dict 
 
         def set_by_name(keys: list[str], value) -> bool:
             for k in keys:
-                if k in names:
-                    i = names.index(k)
-                    if i < len(wv):
-                        old = wv[i]
-                        if old != value:
-                            wv[i] = value
-                            changes.append(f"  {ntype}.{k}: {old} -> {value}")
-                        return True
+                if k not in names:
+                    continue
+                i = names.index(k)
+                if i >= len(wv):
+                    return True
+                old = wv[i]
+                # 型が変わる書き換えはインデックスずれのサイン。
+                # 黙って壊すより、書き換えを中止して警告する。
+                if isinstance(old, str) and not isinstance(value, str):
+                    changes.append(
+                        f"  !! {ntype}.{k} をスキップ: 既存値が {old!r}（文字列）で "
+                        f"{value!r} と型が違う。ノード定義とワークフローの不整合の可能性")
+                    return True
+                if old != value:
+                    wv[i] = value
+                    changes.append(f"  {ntype}.{k}: {old} -> {value}")
+                return True
             return False
 
         # 保存ノード
