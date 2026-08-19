@@ -61,23 +61,35 @@ SAMPLER_NODE_TYPES = re.compile(r"Sampler", re.I)
 # 1. 公式テンプレートを探す
 # ---------------------------------------------------------------------------
 def find_templates() -> list[str]:
-    roots = []
-    # pip パッケージ comfyui-workflow-templates
-    try:
-        import comfyui_workflow_templates as t
-        roots.append(os.path.dirname(t.__file__))
-    except ImportError:
-        pass
-    # フロントエンドに同梱されるパターン
+    """H3 のローカル用テンプレート JSON を探す。
+
+    テンプレートは ComfyUI のバージョンによって置き場所が変わる。
+    v0.33 時点では pip パッケージが分割されており、実体は
+    `comfyui_workflow_templates_json`（_json 付き）に入っている。
+    名前を決め打ちせず、comfyui_workflow_templates* を総当たりする。
+    """
+    roots: list[str] = []
+
+    # site-packages 内の comfyui_workflow_templates* を全部見る
+    for sp in list(sys.path):
+        if not os.path.isdir(sp):
+            continue
+        try:
+            entries = os.listdir(sp)
+        except OSError:
+            continue
+        for e in entries:
+            if e.startswith("comfyui_workflow_templates"):
+                d = os.path.join(sp, e)
+                if os.path.isdir(d):
+                    roots.append(d)
+
+    # ComfyUI 本体側に同梱されるパターン
     roots += [
         os.path.join(COMFY, "web", "templates"),
         os.path.join(COMFY, "custom_nodes"),
         os.path.join(COMFY, "user", "default", "workflows"),
     ]
-    for sp in sys.path:
-        cand = os.path.join(sp, "comfyui_workflow_templates")
-        if os.path.isdir(cand):
-            roots.append(cand)
 
     hits: list[str] = []
     for root in roots:
@@ -85,14 +97,19 @@ def find_templates() -> list[str]:
             continue
         for p in glob.glob(os.path.join(root, "**", "*.json"), recursive=True):
             name = os.path.basename(p).lower()
-            if ("minimax" in name or "_h3" in name or name.startswith("h3")) and "h3" in name:
-                hits.append(p)
+            if "h3" not in name:
+                continue
+            # api_* は MiniMax のクラウド API を叩くテンプレート。
+            # 今回はローカル推論なので必ず除外する。
+            if name.startswith("api_"):
+                continue
+            hits.append(p)
     return sorted(set(hits))
 
 
 def pick_template(templates: list[str], prefer: str) -> str | None:
     """prefer: 'ref2va'(リファレンス画像→動画) を優先し、無ければ i2v/t2v"""
-    order = [prefer, "ref2va", "r2v", "reference", "i2v", "image_to_video", "fl2va", "t2v"]
+    order = [prefer, "_r2v", "r2v", "ref2va", "reference", "_i2v", "i2v", "fl2va", "_t2v", "t2v"]
     for key in order:
         for t in templates:
             if key in os.path.basename(t).lower():
@@ -204,7 +221,7 @@ def main() -> int:
             print("   (なし)")
         return 0
 
-    base_path = args.template or pick_template(templates, "ref2va")
+    base_path = args.template or pick_template(templates, "_r2v")
     if not base_path or not os.path.isfile(base_path):
         print("[make-workflows:ERROR] MiniMax H3 の公式テンプレートが見つかりませんでした。", file=sys.stderr)
         print("  ComfyUI が 0.30.0 以降か確認してください。", file=sys.stderr)
