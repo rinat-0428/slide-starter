@@ -1,18 +1,30 @@
 #!/usr/bin/env python3
 """
-ComfyUI 公式の MiniMax H3 テンプレートをベースに、
+ComfyUI 公式の MiniMax H3 テンプレートから
 Preview 用 / Quality 用の 2 本のワークフローを生成する。
 
 なぜテンプレートから作るのか:
-  H3 のノードは 2026-08-03 に ComfyUI 本体へ入ったばかりで、
-  ノード名や入力の仕様が変わりうる。手書きの JSON は壊れやすいので、
-  インストール済み ComfyUI に同梱された公式テンプレートを正として、
-  必要な値（steps / 解像度 / フレーム数 / 保存先）だけを書き換える。
+  H3 のノードは 2026-08-03 に ComfyUI 本体へ入ったばかりで仕様が動く。
+  手書き JSON は壊れやすいので、同梱の公式テンプレートを正として、
+  そこに用意されたコントロールノードの値だけを差し替える。
+
+重要:
+  公式テンプレートは width/height/length/steps を
+  ノードのウィジェットではなく「コントロールノードからのリンク」で供給する。
+  そのため対象ノードの widgets_values を書き換えても効かない。
+  必ず供給元（Resolution Selector / Duration / Lightning LoRA スイッチ）を触ること。
+
+  テンプレートの制御構造:
+      Boolean (Enable Lightning LoRA) ─┬→ If/Else Switch (model) → UNet or LoRA
+                                       └→ If/Else Switch (Steps) → 4 or 20 steps
+      Resolution Selector (Size)  → width / height
+      Float (Duration)            → 数式ノード → length（フレーム数）
+      Input Text (Prompt)         → prompt
 
 使い方:
     python3 /workspace/make-workflows.py                 # 既定 (user=shared)
-    python3 /workspace/make-workflows.py --user yasu     # 保存先をユーザー別に
-    python3 /workspace/make-workflows.py --list          # 見つかったテンプレート一覧
+    python3 /workspace/make-workflows.py --user yasu
+    python3 /workspace/make-workflows.py --list          # テンプレート一覧
 """
 from __future__ import annotations
 
@@ -30,47 +42,40 @@ WS = os.environ.get("WORKSPACE", "/workspace")
 COMFY = os.path.join(WS, "comfyui")
 OUT_DIR = os.path.join(WS, "workflows")
 
-# Preview = 速さ優先 / Quality = 品質優先
+# megapixels と実解像度の対応（テンプレート同梱の Size Settings Reference より、16:9・multiple=32）
+#   0.2 -> 608x352   0.4 -> 864x480   0.7 -> 1152x640   0.9 -> 1280x736
 PRESETS = {
     "preview": {
-        "steps": 8,
-        "width": 640,
-        "height": 384,
-        "length": 61,       # ≒ 2.5秒 @24fps
+        "lightning": True,    # Lightning LoRA を有効化 → 4 steps
+        "megapixels": 0.2,    # 608 x 352
+        "duration": 3.0,      # 秒
     },
     "quality": {
-        "steps": 20,        # 公式ベースラインが 20 steps
-        "width": 1280,
-        "height": 720,
-        "length": 121,      # ≒ 5秒 @24fps
+        "lightning": False,   # フルモデル → 20 steps
+        "megapixels": 0.9,    # 1280 x 736
+        "duration": 5.0,
     },
 }
 
-# 書き換え対象のウィジェット名（ノード実装によって名前が揺れるので候補を列挙）
-WIDGET_ALIASES = {
-    "steps":  ["steps"],
-    "width":  ["width"],
-    "height": ["height"],
-    "length": ["length", "num_frames", "frames", "video_frames"],
-}
+# テンプレート側のコントロールノード（タイトルで特定する）
+TITLE_LIGHTNING = "Boolean (Enable Lightning LoRA)"
+TITLE_RESOLUTION = "Resolution Selector (Size)"
+TITLE_DURATION = "Float (Duration)"
 
-SAVE_NODE_TYPES = re.compile(r"(SaveVideo|SaveWEBM|SaveAnimated|VHS_VideoCombine|SaveAudio)", re.I)
+SAVE_NODE_TYPES = re.compile(r"(SaveVideo|SaveWEBM|SaveAnimated|VHS_VideoCombine)", re.I)
 
 
 # ---------------------------------------------------------------------------
-# 1. 公式テンプレートを探す
+# テンプレート探索
 # ---------------------------------------------------------------------------
 def find_templates() -> list[str]:
     """H3 のローカル用テンプレート JSON を探す。
 
-    テンプレートは ComfyUI のバージョンによって置き場所が変わる。
-    v0.33 時点では pip パッケージが分割されており、実体は
-    `comfyui_workflow_templates_json`（_json 付き）に入っている。
-    名前を決め打ちせず、comfyui_workflow_templates* を総当たりする。
+    置き場所は ComfyUI のバージョンで変わる。v0.33 時点では pip パッケージが
+    分割され、実体は comfyui_workflow_templates_json 側にある。
+    パッケージ名を決め打ちせず comfyui_workflow_templates* を総当たりする。
     """
     roots: list[str] = []
-
-    # site-packages 内の comfyui_workflow_templates* を全部見る
     for sp in list(sys.path):
         if not os.path.isdir(sp):
             continue
@@ -83,8 +88,6 @@ def find_templates() -> list[str]:
                 d = os.path.join(sp, e)
                 if os.path.isdir(d):
                     roots.append(d)
-
-    # ComfyUI 本体側に同梱されるパターン
     roots += [
         os.path.join(COMFY, "web", "templates"),
         os.path.join(COMFY, "custom_nodes"),
@@ -99,8 +102,7 @@ def find_templates() -> list[str]:
             name = os.path.basename(p).lower()
             if "h3" not in name:
                 continue
-            # api_* は MiniMax のクラウド API を叩くテンプレート。
-            # 今回はローカル推論なので必ず除外する。
+            # api_* は MiniMax のクラウド API を叩くテンプレート。ローカル推論では使わない。
             if name.startswith("api_"):
                 continue
             hits.append(p)
@@ -108,8 +110,7 @@ def find_templates() -> list[str]:
 
 
 def pick_template(templates: list[str], prefer: str) -> str | None:
-    """prefer: 'ref2va'(リファレンス画像→動画) を優先し、無ければ i2v/t2v"""
-    order = [prefer, "_r2v", "r2v", "ref2va", "reference", "_i2v", "i2v", "fl2va", "_t2v", "t2v"]
+    order = [prefer, "_r2v", "r2v", "reference", "_i2v", "i2v", "_t2v", "t2v"]
     for key in order:
         for t in templates:
             if key in os.path.basename(t).lower():
@@ -118,8 +119,7 @@ def pick_template(templates: list[str], prefer: str) -> str | None:
 
 
 # ---------------------------------------------------------------------------
-# 2. ノードのウィジェット名を解決する
-#    ComfyUI の /object_info から「入力の順番」を取れると正確に書き換えられる
+# ノード定義（/object_info）からウィジェット名の並びを得る
 # ---------------------------------------------------------------------------
 def load_object_info() -> dict | None:
     url = f"http://127.0.0.1:{os.environ.get('COMFY_PORT', '8188')}/object_info"
@@ -131,111 +131,98 @@ def load_object_info() -> dict | None:
 
 
 def widget_order(object_info: dict | None, node_type: str) -> list[str]:
-    """そのノードの widgets_values に対応する入力名を順番に返す"""
     if not object_info or node_type not in object_info:
         return []
     spec = object_info[node_type].get("input", {})
     names: list[str] = []
     for group in ("required", "optional"):
         for name, meta in (spec.get(group) or {}).items():
-            # リンク接続専用（MODEL/LATENT/IMAGE等）はウィジェットにならない。
-            # ウィジェットになるのは以下:
-            #   - 選択肢リスト（COMBO）
-            #       旧形式: ["euler","dpmpp_2m",...] というリスト
-            #       新形式(v0.33): 文字列 "COMBO"（選択肢は別フィールド）
-            #   - INT / FLOAT / STRING / BOOLEAN
-            # ここを取りこぼすと widgets_values のインデックスがずれ、
-            # 別のウィジェットを踏み潰すので必ず両形式を見る。
             t = meta[0] if isinstance(meta, (list, tuple)) and meta else meta
-            if isinstance(t, list):
+            if isinstance(t, (list, dict)):
                 names.append(name)
-            elif isinstance(t, dict):
-                names.append(name)
-            elif isinstance(t, str) and t in ("COMBO", "INT", "FLOAT", "STRING", "BOOLEAN"):
+            elif isinstance(t, str) and (
+                "COMBO" in t or t in ("INT", "FLOAT", "STRING", "BOOLEAN")
+            ):
                 names.append(name)
     return names
 
 
 # ---------------------------------------------------------------------------
-# 3. 書き換え
+# 書き換え
 # ---------------------------------------------------------------------------
-def patch(workflow: dict, preset: dict, user: str, mode: str, object_info: dict | None) -> list[str]:
+def patch(workflow: dict, preset: dict, user: str, mode: str,
+          object_info: dict | None) -> tuple[list[str], list[str]]:
     changes: list[str] = []
+    warnings: list[str] = []
     nodes = workflow.get("nodes", [])
+    by_title = {n.get("title"): n for n in nodes if n.get("title")}
 
-    # 保存先: /workspace/outputs/<user>/<mode>/YYYYMMDD_HHMMSS_<user>_<mode>_<seed>
-    # ComfyUI の filename_prefix は %date:...% と %NodeTitle.widget% を展開できる
-    # seed をファイル名に埋めるため、実際に seed ウィジェットを持つノードを探す。
-    # "Sampler" を名前で拾うと KSamplerSelect（seed を持たない）を掴んでしまうので、
-    # ノード定義から seed / noise_seed を実際に持つものだけを対象にする。
+    def set_widget(title: str, index: int, value, label: str) -> None:
+        n = by_title.get(title)
+        if n is None:
+            warnings.append(f"  !! コントロールノードが見つかりません: {title!r}（{label} 未設定）")
+            return
+        wv = n.get("widgets_values")
+        if not isinstance(wv, list) or index >= len(wv):
+            warnings.append(f"  !! {title!r} の widgets_values が想定と違います: {wv!r}")
+            return
+        old = wv[index]
+        if type(old) is not type(value) and not (
+            isinstance(old, (int, float)) and isinstance(value, (int, float))
+        ):
+            warnings.append(
+                f"  !! {title!r}[{index}] の型が違います（{old!r} -> {value!r}）。スキップします")
+            return
+        if old != value:
+            wv[index] = value
+            changes.append(f"  {label}: {old} -> {value}   ({title})")
+
+    # Lightning LoRA の ON/OFF がモデル経路と steps を同時に切り替える
+    set_widget(TITLE_LIGHTNING, 0, preset["lightning"], "Lightning LoRA")
+    # ResolutionSelector = [アスペクト, megapixels, multiple]
+    set_widget(TITLE_RESOLUTION, 1, preset["megapixels"], "解像度(megapixels)")
+    # Duration(秒) は数式ノード経由でフレーム数になる
+    set_widget(TITLE_DURATION, 0, preset["duration"], "長さ(秒)")
+
+    # 保存先。SaveVideo の filename_prefix は通常のウィジェットなので直接書ける。
+    # seed は実際に seed / noise_seed を持つノードのタイトルを参照する。
     seed_token = ""
     for n in nodes:
-        ntype = n.get("type", "")
-        names = widget_order(object_info, ntype)
+        names = widget_order(object_info, n.get("type", ""))
         for cand in ("seed", "noise_seed"):
             if cand in names:
-                title = n.get("title") or ntype
-                seed_token = f"_%{title}.{cand}%"
+                seed_token = f"_%{n.get('title') or n.get('type')}.{cand}%"
                 break
         if seed_token:
             break
     prefix = f"{user}/{mode}/%date:yyyyMMdd_hhmmss%_{user}_{mode}{seed_token}"
 
+    saved = False
     for n in nodes:
         ntype = n.get("type", "")
+        if not SAVE_NODE_TYPES.search(ntype):
+            continue
         wv = n.get("widgets_values")
         if not isinstance(wv, list):
             continue
         names = widget_order(object_info, ntype)
+        if "filename_prefix" in names:
+            i = names.index("filename_prefix")
+            if i < len(wv):
+                changes.append(f"  保存先: {wv[i]} -> {prefix}   ({ntype})")
+                wv[i] = prefix
+                saved = True
+    if not saved:
+        warnings.append("  !! SaveVideo の filename_prefix を設定できませんでした")
 
-        def set_by_name(keys: list[str], value) -> bool:
-            for k in keys:
-                if k not in names:
-                    continue
-                i = names.index(k)
-                if i >= len(wv):
-                    return True
-                old = wv[i]
-                # 型が変わる書き換えはインデックスずれのサイン。
-                # 黙って壊すより、書き換えを中止して警告する。
-                if isinstance(old, str) and not isinstance(value, str):
-                    changes.append(
-                        f"  !! {ntype}.{k} をスキップ: 既存値が {old!r}（文字列）で "
-                        f"{value!r} と型が違う。ノード定義とワークフローの不整合の可能性")
-                    return True
-                if old != value:
-                    wv[i] = value
-                    changes.append(f"  {ntype}.{k}: {old} -> {value}")
-                return True
-            return False
-
-        # 保存ノード
-        if SAVE_NODE_TYPES.search(ntype):
-            if not set_by_name(["filename_prefix"], prefix):
-                # スキーマが無い場合: パスっぽい文字列ウィジェットを差し替える
-                for i, v in enumerate(wv):
-                    if isinstance(v, str) and ("/" in v or v.lower() in ("comfyui", "video")):
-                        changes.append(f"  {ntype}[{i}] (推定 filename_prefix): {v!r} -> {prefix!r}")
-                        wv[i] = prefix
-                        break
-            continue
-
-        # サンプラー・解像度・長さ
-        if names:
-            set_by_name(WIDGET_ALIASES["steps"], preset["steps"])
-            set_by_name(WIDGET_ALIASES["width"], preset["width"])
-            set_by_name(WIDGET_ALIASES["height"], preset["height"])
-            set_by_name(WIDGET_ALIASES["length"], preset["length"])
-
-    return changes
+    return changes, warnings
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--user", default=os.environ.get("H3_USER", "shared"),
-                    help="出力先フォルダ名 (例: yasu)")
-    ap.add_argument("--template", help="ベースにするテンプレート JSON のパス（省略時は自動検出）")
-    ap.add_argument("--list", action="store_true", help="見つかったテンプレートを表示して終了")
+    ap.add_argument("--user", default=os.environ.get("H3_USER", "shared"))
+    ap.add_argument("--template")
+    ap.add_argument("--list", action="store_true")
     args = ap.parse_args()
 
     templates = find_templates()
@@ -249,10 +236,11 @@ def main() -> int:
 
     base_path = args.template or pick_template(templates, "_r2v")
     if not base_path or not os.path.isfile(base_path):
-        print("[make-workflows:ERROR] MiniMax H3 の公式テンプレートが見つかりませんでした。", file=sys.stderr)
+        print("[make-workflows:ERROR] MiniMax H3 の公式テンプレートが見つかりませんでした。",
+              file=sys.stderr)
         print("  ComfyUI が 0.30.0 以降か確認してください。", file=sys.stderr)
-        print("  UI の Workflow > Browse Templates から H3 のテンプレートを開き、", file=sys.stderr)
-        print("  Export して --template で渡すこともできます。", file=sys.stderr)
+        print("  UI の Workflow > Browse Templates から H3 を開いて Export し、", file=sys.stderr)
+        print("  --template で渡すこともできます。", file=sys.stderr)
         return 1
 
     print(f"[make-workflows] ベーステンプレート: {base_path}")
@@ -261,40 +249,43 @@ def main() -> int:
 
     object_info = load_object_info()
     if object_info:
-        print("[make-workflows] ComfyUI /object_info からノード定義を取得しました（正確な書き換え）")
+        print("[make-workflows] ComfyUI /object_info からノード定義を取得しました")
     else:
-        print("[make-workflows] ⚠ ComfyUI が起動していないため推定で書き換えます。")
-        print("[make-workflows]   起動後にもう一度実行すると精度が上がります。")
+        print("[make-workflows] ⚠ ComfyUI が起動していません。保存先の設定精度が落ちます。")
 
     os.makedirs(OUT_DIR, exist_ok=True)
+    had_warning = False
     for mode, preset in PRESETS.items():
         wf = copy.deepcopy(base)
-        changes = patch(wf, preset, args.user, mode, object_info)
+        changes, warnings = patch(wf, preset, args.user, mode, object_info)
         dest = os.path.join(OUT_DIR, f"h3_{mode}.json")
         with open(dest, "w", encoding="utf-8") as f:
             json.dump(wf, f, ensure_ascii=False, indent=2)
-        print(f"[make-workflows] ✓ {dest}  ({mode}: {preset['steps']} steps, "
-              f"{preset['width']}x{preset['height']}, {preset['length']} frames)")
+
+        steps = 4 if preset["lightning"] else 20
+        print(f"\n[make-workflows] ✓ {dest}")
+        print(f"    {mode}: Lightning LoRA={preset['lightning']} ({steps} steps) / "
+              f"{preset['megapixels']} MP / {preset['duration']} 秒")
         for c in changes:
             print(c)
-        if not changes:
-            print("  ⚠ 何も書き換えられませんでした。UI で steps / 解像度 / 保存先を手動確認してください。")
+        for w in warnings:
+            print(w)
+            had_warning = True
 
-    # ComfyUI のワークフロー一覧（左サイドバー）からワンクリックで開けるように複製する。
-    # チームがファイルパスを打たずに済むので、運用上ここが効く。
+    # ComfyUI の Workflows サイドバーからワンクリックで開けるように複製する
     ui_dir = os.path.join(COMFY, "user", "default", "workflows")
     try:
         os.makedirs(ui_dir, exist_ok=True)
         for mode in PRESETS:
-            src = os.path.join(OUT_DIR, f"h3_{mode}.json")
-            dst = os.path.join(ui_dir, f"h3_{mode}.json")
-            shutil.copyfile(src, dst)
-        print(f"[make-workflows] ✓ ComfyUI のワークフロー一覧にも配置: {ui_dir}")
+            shutil.copyfile(os.path.join(OUT_DIR, f"h3_{mode}.json"),
+                            os.path.join(ui_dir, f"h3_{mode}.json"))
+        print(f"\n[make-workflows] ✓ ComfyUI のワークフロー一覧にも配置: {ui_dir}")
     except OSError as e:
-        print(f"[make-workflows] ⚠ ComfyUI 側への配置に失敗: {e}")
+        print(f"\n[make-workflows] ⚠ ComfyUI 側への配置に失敗: {e}")
 
-    print("\n[make-workflows] 完了。ComfyUI 左サイドバーの Workflows から開けます。")
     print(f"[make-workflows] 出力先: /workspace/outputs/{args.user}/preview|quality/")
+    if had_warning:
+        print("[make-workflows] ⚠ 警告があります。UI で該当ノードを確認してください。")
     return 0
 
 

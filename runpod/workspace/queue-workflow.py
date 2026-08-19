@@ -52,7 +52,11 @@ def widget_names(object_info: dict, node_type: str) -> list[str]:
             t = meta[0] if isinstance(meta, (list, tuple)) and meta else meta
             if isinstance(t, (list, dict)):
                 names.append(name)
-            elif isinstance(t, str) and t in ("COMBO", "INT", "FLOAT", "STRING", "BOOLEAN"):
+            elif isinstance(t, str) and (
+                # v0.33 は COMBO を文字列で返す。さらに SaveVideo.codec のように
+                # COMFY_DYNAMICCOMBO_V3 という派生型もあるので部分一致で拾う。
+                "COMBO" in t or t in ("INT", "FLOAT", "STRING", "BOOLEAN")
+            ):
                 names.append(name)
     return names
 
