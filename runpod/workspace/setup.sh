@@ -174,6 +174,19 @@ for v in VARIANTS:
     f = pick(rf"minimax_h3_{v}_{DIT_QUANT}\b", f"diffusion model ({v}/{DIT_QUANT})")
     targets.append((f, "diffusion_models"))
 targets.append((pick(rf"qwen3vl.*minimax_h3.*{TE_QUANT}", f"text encoder ({TE_QUANT})"), "text_encoders"))
+
+# 公式ワークフローは Turbo LoRA（少ステップ化）を前提に組まれている。
+# これが無いと ComfyUI の検証で lora_name が not in [] になって生成できない。
+# ref2va -> ref2v / fl2va -> fl2v と命名が揺れるので末尾の a を落として探す。
+for v in VARIANTS:
+    key = v[:-1] if v.endswith("a") else v
+    loras = [f for f in files
+             if f.startswith("loras/") and f.endswith(".safetensors")
+             and f"minimax_h3_{key}_turbo" in f]
+    if not loras:
+        print(f"[setup] WARN: {v} 用の turbo LoRA が見つかりません")
+    for f in sorted(loras):
+        targets.append((f, "loras"))
 targets.append((pick(r"minimax_h3_video_vae", "video VAE"), "vae"))
 targets.append((pick(r"minimax_h3_audio_vae", "audio VAE"), "vae"))
 
