@@ -67,10 +67,10 @@ Audit log を見ると 2025-06 に Pod の Start / Stop 履歴がありますが
 
 | 項目 | 値 |
 |------|-----|
-| Pod 名 | `reasonable_silver_primate` |
-| Pod ID | `l48astr20rg17x` |
+| Pod 名 | `colossal_aqua_mite` |
+| Pod ID | `d331tpnh4fx4tu` |
 | リージョン | **AP-JP-1**（Network Volume により自動ロック） |
-| GPU | **NVIDIA H100 80GB HBM3** / driver 570.124.06 / $3.29/hr |
+| GPU | **NVIDIA H200 141GB** / $4.59/hr（当初 H100 80GB $3.29/hr で構築、在庫切れで移行） |
 | テンプレート | `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404`（torch 2.8.0 / CUDA 12.8） |
 | Network Volume | `h3-shared` / 200GB / AP-JP-1 / ID `aagj8f1j6a` |
 | Container disk | 30GB（一時領域） |
@@ -309,6 +309,33 @@ ls -lhR /workspace/outputs/
 ```bash
 bash /workspace/record-environment.sh
 ```
+
+---
+
+## Zero GPU Pods に実際に遭遇した記録（2026-08-19）
+
+Stop した Pod を Start しようとしたところ、想定どおり
+「Your Pod's GPUs are no longer available.」が出ました。**AP-JP-1 の H100 は 1 台しかなく、
+Stop 中に他のユーザーに取られたためです。**
+
+このとき RunPod は3つの選択肢を出しますが、**「Automatically migrate your Pod data」を選んではいけません。**
+
+- ネットワークボリュームは**データセンターに固定**される。移行先が AP-JP-1 の外になると
+  `h3-shared` が付いてこず、65GB のモデルも生成物も参照できなくなる
+- US / EU に移ると **H3 のライセンス違反**になる
+- そもそも中身は全部ネットワークボリューム側なので、移行対象の「Pod のデータ」は実質ない
+
+**正しい対処は「Do nothing」を選び、Terminate して同じボリュームで作り直すこと。**
+Deploy 画面で `h3-shared` を選べばリージョンは自動で AP-JP-1 にロックされます。
+
+実際の復旧はこうなりました。
+
+1. Deploy 画面で `h3-shared` を選択 → AP-JP-1 に自動ロック
+2. 在庫を確認 → H100 は Unavailable、**H200 は Low（空きあり）**
+3. H200 + PyTorch 2.8.0 + ポート `8888,8188` + Start command で Deploy
+4. **セットアップのやり直しは不要。** 1〜2分で ComfyUI が自動起動し、そのまま生成できた
+
+GPU が H100 → H200 に変わっても、`/workspace` は同一なのでそのまま動きます。
 
 ---
 
