@@ -63,6 +63,38 @@ Audit log を見ると 2025-06 に Pod の Start / Stop 履歴がありますが
 
 ---
 
+## 構築済みの環境（2026-08-19 実機構築）
+
+| 項目 | 値 |
+|------|-----|
+| Pod 名 | `reasonable_silver_primate` |
+| Pod ID | `l48astr20rg17x` |
+| リージョン | **AP-JP-1**（Network Volume により自動ロック） |
+| GPU | **NVIDIA H100 80GB HBM3** / driver 570.124.06 / $3.29/hr |
+| テンプレート | `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404`（torch 2.8.0 / CUDA 12.8） |
+| Network Volume | `h3-shared` / 200GB / AP-JP-1 / ID `aagj8f1j6a` |
+| Container disk | 30GB（一時領域） |
+| 公開ポート | HTTP `8888`(Jupyter), `8188`(ComfyUI) / TCP `22` |
+| 実行コスト | 約 $3.31/hr（GPU + ディスク + Volume） |
+
+**Pod 作成時にテンプレートを PyTorch 2.4.0 から 2.8.0 に変更しています。**
+既定の 2.4.0 は 2024 年相当で、ComfyUI 0.30+ / H3 には古いためです。
+
+### スクリプトの配布方法
+
+`runpod/workspace/` はこのリポジトリに入っているので、Pod 側では curl で取得できます。
+
+```bash
+cd /workspace && B=https://raw.githubusercontent.com/rinat-0428/slide-starter/main/runpod/workspace && \
+for f in setup.sh start-comfyui.sh make-workflows.py record-environment.sh README.md; do
+  curl -fsSL -O $B/$f
+done; chmod +x *.sh *.py
+```
+
+Pod を作り直したときも、この 1 コマンドで復旧できます。
+
+---
+
 ## 事前に決めること
 
 ### 1. リージョンは AP-JP-1（日本・福島）一択
