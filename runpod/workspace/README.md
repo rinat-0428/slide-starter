@@ -38,7 +38,7 @@ Always use STOP after finishing your work.
 
 ### Preview（速い・ラフ確認用）
 
-1. ComfyUI の **Workflow → Open** から `/workspace/workflows/h3_preview.json` を読み込む
+1. ComfyUI 左サイドバーの **Workflows** から `h3_preview` を開く
 2. **Load Image** ノードにリファレンス画像をセット
 3. **Prompt** に作りたい映像の説明を入れる
 4. **Queue Prompt** を押す
@@ -46,17 +46,21 @@ Always use STOP after finishing your work.
 
 ### Quality（遅い・本番用）
 
-手順は同じで、読み込むファイルが `/workspace/workflows/h3_quality.json` になるだけです。
+手順は同じで、開くワークフローが `h3_quality` になるだけです。
 
 ### Preview と Quality の使い分け
 
 | | Preview 🐇 | Quality 🐢 |
 |---|---|---|
-| 速さ | 速い | 遅い |
+| 速さ | **約5秒** | 数分 |
 | 用途 | 構図・動きのラフ確認 | 最終版 |
-| steps | 8 | 20 |
-| 解像度 | 640×384 | 1280×720 |
-| 長さ | 約2.5秒 | 約5秒 |
+| Lightning LoRA | ON | OFF |
+| steps | 4 | 20 |
+| 解像度 | 608×352 | 1280×736 |
+| 長さ | 3秒 | 5秒 |
+
+Preview が速いのは **Lightning LoRA**（少ステップ化）を有効にしているからです。
+Quality はこれを切ってフルモデルで回します。
 
 **まず Preview で試して、良さそうなら同じ prompt / seed で Quality。** これが一番速く仕上がります。
 
@@ -71,30 +75,51 @@ Always use STOP after finishing your work.
 /workspace/outputs/<あなたの名前>/quality/
 ```
 
-ファイル名の形式:
+ファイル名は次のようになります。
 
 ```
-20260818_142233_yasu_quality_123456.mp4
- └日付   └時刻  └ユーザー └モード  └seed
+shared_preview_00001_.mp4
 ```
+
+`_00001_` は ComfyUI が自動で付ける連番です。
 
 ### 自分専用のフォルダにするには
 
-ワークフローを読み込んだあと、**Save Video** ノードの `filename_prefix` を見てください。
-
-```
-shared/preview/%date:yyyyMMdd_hhmmss%_shared_preview_%KSampler.seed%
-└──┬──┘        
-   ここの shared を自分の名前に変える（3か所）
-```
-
-またはターミナルで一発で作れます:
+ターミナルで一発で作れます。
 
 ```bash
 python3 /workspace/make-workflows.py --user yasu
 ```
 
+UI で直接変えたい場合は、**Save Video** ノードの `filename_prefix` の
+`shared` の部分を自分の名前にしてください。
+
+```
+shared/preview/shared_preview
+└─┬──┘         └─┬──┘
+  ここ            ここ
+```
+
 > **他の人の output フォルダは触らないでください。**
+
+### 日時と seed を入れたい場合
+
+ComfyUI の UI からでは、ファイル名に日時や seed を自動で入れることはできません
+（`%date:...%` は v0.33 の Save Video では展開されず、
+`%ノード名.seed%` は画面上でしか解決されません）。
+
+日時と seed を含む名前が必要なときは、ターミナルから投入してください。
+
+```bash
+python3 /workspace/queue-workflow.py --workflow /workspace/workflows/h3_preview.json --image あなたの画像.png --prompt "作りたい映像の説明"
+```
+
+この場合はこの形式で保存されます。
+
+```
+20260819_073639_shared_preview_12345_00001_.mp4
+ └日付   └時刻  └ユーザー └モード  └seed
+```
 
 ---
 
@@ -116,7 +141,21 @@ Stop しても以下は残ります:
 
 ---
 
-## 5. 困ったときは
+## 5. 設定を変えるときの注意
+
+解像度・長さ・steps は、**Save Video や生成ノードの数字を直接いじっても効きません。**
+これらは専用のコントロールノードから供給されています。次のノードを触ってください。
+
+| 変えたいもの | 触るノード |
+|--------------|------------|
+| 速さ / steps | `Boolean (Enable Lightning LoRA)`（ON=4 steps、OFF=20 steps） |
+| 解像度 | `Resolution Selector (Size)` の megapixels（0.2=608×352 … 0.9=1280×736） |
+| 長さ | `Float (Duration)`（秒） |
+| プロンプト | `Input Text (Prompt)` |
+
+---
+
+## 6. 困ったときは
 
 ### ComfyUI の画面が開かない
 
@@ -166,7 +205,7 @@ ls -lh /workspace/outputs/<あなたの名前>/preview/
 
 ---
 
-## 6. フォルダ構成
+## 7. フォルダ構成
 
 ```
 /workspace/
@@ -194,7 +233,7 @@ ls -lh /workspace/outputs/<あなたの名前>/preview/
 
 ---
 
-## 7. 管理者向けメモ
+## 8. 管理者向けメモ
 
 - 初回セットアップ: `bash /workspace/setup.sh`
 - 自動起動の設定: Pod の **Container Start Command** に
