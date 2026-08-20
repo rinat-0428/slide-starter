@@ -355,7 +355,19 @@ Pod 設定を **テンプレート `h3-comfyui`** として保存済みです（
    **確認ダイアログの「Also delete attached network volume (h3-shared)」は
    絶対にチェックしないこと。** 入れると 65GB のモデルと全生成物が消える。
    既定はオフなので、そのまま Terminate Pod を押せばよい。
-1. **Deploy** → テンプレート `h3-comfyui` を選ぶ
+1. **Deploy** → **Pod template を必ず `h3-comfyui` に変更する**
+
+   既定は **`Runpod Pytorch 2.4.0`** で、これは使わない。
+   `Change template` から選び直すこと。忘れると起動コマンドもポート設定も
+   入らないため、**ComfyUI が自動起動せず 8188 も開かない**。
+   デプロイ自体は成功してしまうので気づきにくい。
+   Pod summary に **`Template overrides applied`** が出ていれば正しい。
+
+   > 実際に構築時、テンプレート選択で Community 製の別テンプレート
+   > (`smyshnikof/comfyui`) を掴んでしまったことがある。
+   > 選んだあとに image 名が
+   > `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404` になっているか目視すること。
+
 2. Network volume に **`h3-shared`** を選ぶ（リージョンが AP-JP-1 に自動ロック）
 3. GPU は **H100 SXM**（$3.29/hr）か **H200 SXM**（$4.59/hr）の空いている方
 

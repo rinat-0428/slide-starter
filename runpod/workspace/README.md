@@ -50,10 +50,34 @@ AP-JP-1 は GPU の台数が少なく、Stop 中に他の人に取られると�
    >
    > オフなら、消えるのは Pod の設定とコンテナだけです。
 
-2. **Deploy** → テンプレート **`h3-comfyui`** を選ぶ
-3. Network volume に **`h3-shared`** を選ぶ（リージョンは自動で AP-JP-1 になります）
-4. GPU は **H100 SXM** か **H200 SXM** の空いている方
-5. Deploy
+2. **Deploy** を押す
+3. **Pod template を必ず `h3-comfyui` に変更する**
+
+   > ### 🚨 ここも絶対に忘れないでください
+   >
+   > Deploy 画面の Pod template は、既定で **`Runpod Pytorch 2.4.0`** になっています。
+   > **これは今回使うテンプレートではありません。**
+   >
+   > **`Change template` を押して `h3-comfyui` を選び直してください。**
+   >
+   > 変更し忘れると、こうなります。
+   >
+   > - **ComfyUI が自動起動しない**（起動コマンドが入っていないため）
+   > - **Port 8188 が開かない**（ポート設定が入っていないため）
+   > - PyTorch が 2.4.0（2024年相当）で、H3 には古い
+   >
+   > 一見デプロイは成功するので、**8188 が Ready にならなくて初めて気づきます。**
+   > その場合は作り直しになるので、Deploy を押す前に必ず確認してください。
+   >
+   > **確認方法**: Deploy ボタンの上の Pod summary に
+   > **`Template overrides applied`** のバッジが出ていればOKです。
+
+4. Network volume に **`h3-shared`** を選ぶ（リージョンは自動で AP-JP-1 になります）
+5. GPU は **H100 SXM** か **H200 SXM** の空いている方
+6. **Deploy** を押す前に、もう一度この2つを目視で確認する
+   - Pod template = **`h3-comfyui`**
+   - Network volume = **`h3-shared`**
+7. Deploy
 
 **セットアップのやり直しは不要**です。1〜2分で ComfyUI が自動起動し、
 すぐ生成できます。Stop→Start より作り直しの方が成功しやすいので、
