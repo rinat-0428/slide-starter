@@ -373,6 +373,46 @@ python3 /workspace/make-workflows.py --user yasu --refs 4 \
 
 ---
 
+### 音声リファレンス（.wav など）を付ける
+
+このノードには**音声用の入力スロット**（`ref_audios.ref_audio_0`）も用意されています。
+「この声で喋らせる」「このBGMに合わせる」といった参照に使えます。
+
+**ターミナルで作る**
+
+```bash
+# 画像6枚 + 音声1つ
+python3 /workspace/make-workflows.py --user yasu \
+  --refs 6 --ref-images a.png b.png c.png d.png e.png f.png \
+  --ref-audios voice.wav
+```
+
+**音声だけ足す**（画像はテンプレートのまま2枚）
+
+```bash
+python3 /workspace/make-workflows.py --user yasu --ref-audios voice.wav
+```
+
+**UI で足す**
+
+1. キャンバスをダブルクリック → `Load Audio` を追加
+2. `MiniMax H3 Reference To Video` ノードの **`ref_audio_0`** の入力の丸へ、
+   `Load Audio` の **AUDIO 出力**からドラッグしてつなぐ
+
+音声ファイルも画像と同じ **`/workspace/input/`** に置きます
+（UI の `アップロードするファイルを選択` からでも入ります）。
+
+**プロンプトからの参照は `<Audio 1>`**
+
+```
+<Picture 1> の人物が <Audio 1> の声で話す。
+Use <Picture 1> as the character and <Audio 1> exactly as it is.
+```
+
+> テンプレート付属の初期プロンプトも `<Audio 1>` を参照する書き方になっています。
+
+---
+
 ### プロンプトの書き方（枚数を変えたら必ず読む）
 
 プロンプトの中では **`<Picture 1>` `<Picture 2>` …** で「何枚目の画像か」を指します。
@@ -383,6 +423,7 @@ python3 /workspace/make-workflows.py --user yasu --refs 4 \
 | 1つ目の「画像を読み込む」 | `<Picture 1>` |
 | 2つ目 | `<Picture 2>` |
 | 3つ目 | `<Picture 3>` |
+| 1つ目の「Load Audio」 | `<Audio 1>` |
 
 書き方の例:
 
@@ -426,6 +467,8 @@ python3 /workspace/make-workflows.py --user yasu --refs 1 --ref-images achan.png
 | 2枚 | `--refs 2 --ref-images a.png b.png` |
 | 3枚 | `--refs 3 --ref-images a.png b.png c.png` |
 | 枚数だけ変えて画像はUIで選ぶ | `--refs 3` |
+| 音声を付ける | `--ref-audios voice.wav` |
+| 画像6枚 + 音声1つ | `--refs 6 --ref-images a.png b.png c.png d.png e.png f.png --ref-audios voice.wav` |
 | プロンプトも一緒に | `--prompt "..."` |
 | 自分用フォルダに出す | `--user yasu` |
 

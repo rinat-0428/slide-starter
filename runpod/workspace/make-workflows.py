@@ -153,24 +153,54 @@ def widget_order(object_info: dict | None, node_type: str) -> list[str]:
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-# リファレンス画像の枚数を変える
+# リファレンス（画像 / 音声）の本数を変える
 # ---------------------------------------------------------------------------
 REF_NODE_TYPE = "MiniMaxH3ReferenceToVideo"
-REF_SLOT_PREFIX = "ref_images.ref_image_"
+
+# MiniMaxH3ReferenceToVideo は可変長のオプション入力グループを複数持つ。
+#   ref_images.ref_image_N   … 画像 (IMAGE)
+#   ref_audios.ref_audio_N   … 音声 (AUDIO)
+# ここでは扱うグループごとに「スロット名の作り方」と「読み込みノードの作り方」を定義する。
+REF_GROUPS = {
+    "image": {
+        "prefix": "ref_images.ref_image_",
+        "label": "ref_image_",
+        "io_type": "IMAGE",
+        "loader": "LoadImage",
+        "outputs": lambda lid: [{"name": "IMAGE", "type": "IMAGE", "links": [lid]},
+                                {"name": "MASK", "type": "MASK", "links": None}],
+        "widgets": lambda f: [f, "image"],
+        "named": lambda f: {"image": f, "upload": "image"},
+        "size": [290, 330],
+        "gap": 360,
+        "jp": "リファレンス画像",
+    },
+    "audio": {
+        "prefix": "ref_audios.ref_audio_",
+        "label": "ref_audio_",
+        "io_type": "AUDIO",
+        "loader": "LoadAudio",
+        "outputs": lambda lid: [{"name": "AUDIO", "type": "AUDIO", "links": [lid]}],
+        "widgets": lambda f: [f, None, None],
+        "named": lambda f: {"audio": f},
+        "size": [290, 140],
+        "gap": 170,
+        "jp": "リファレンス音声",
+    },
+}
 
 
-def set_reference_images(workflow: dict, count: int,
-                         filenames: list[str]) -> tuple[list[str], list[str]]:
-    """リファレンス画像を count 枚に作り替える。
+def set_reference_group(workflow: dict, kind: str, count: int,
+                        filenames: list[str]) -> tuple[list[str], list[str]]:
+    """指定グループのリファレンスを count 本に作り替える。
 
-    MiniMaxH3ReferenceToVideo の ref_images は可変長のオプション入力グループで、
-    `ref_images.ref_image_0`, `_1`, ... という名前のスロットが並ぶ。
-    公式テンプレートは 2 枚つないだ状態で出荷され、末尾に空きスロットが 1 つある
-    （ComfyUI の UI が「次の1つ」を常に空けておくため）。ここでも同じ形に揃える。
+    公式テンプレートは末尾に空きスロットを1つ残す作りなので（ComfyUI の UI が
+    「次の1つ」を常に空けておくため）、ここでも count + 1 個に揃える。
 
     リンクの target_slot は inputs 配列の「位置」なので、スロットを増減したら
     後続のリンクの位置を補正しないとグラフが壊れる。そこも面倒を見る。
     """
+    g = REF_GROUPS[kind]
     changes: list[str] = []
     warnings: list[str] = []
     nodes = workflow.get("nodes", [])
@@ -178,34 +208,34 @@ def set_reference_images(workflow: dict, count: int,
 
     target = next((n for n in nodes if n.get("type") == REF_NODE_TYPE), None)
     if target is None:
-        warnings.append(f"  !! {REF_NODE_TYPE} が見つかりません。枚数変更をスキップします")
+        warnings.append(f"  !! {REF_NODE_TYPE} が見つかりません。{g['jp']}の設定をスキップします")
         return changes, warnings
 
     tid = target["id"]
     inputs = target.get("inputs") or []
     idxs = [i for i, inp in enumerate(inputs)
-            if str(inp.get("name", "")).startswith(REF_SLOT_PREFIX)]
+            if str(inp.get("name", "")).startswith(g["prefix"])]
     if not idxs:
-        warnings.append("  !! ref_images スロットが見つかりません")
+        warnings.append(f"  !! {g['prefix']}* スロットが見つかりません")
         return changes, warnings
 
     start, old_n = idxs[0], len(idxs)
     old_connected = sum(1 for i in idxs if inputs[i].get("link") is not None)
 
-    # 既存のリンクと、それを供給していた LoadImage を取り除く
+    # 既存のリンクと、それを供給していた読み込みノードを取り除く
     old_link_ids = {inputs[i]["link"] for i in idxs if inputs[i].get("link") is not None}
     src_ids = {l[1] for l in links
                if isinstance(l, list) and len(l) >= 2 and l[0] in old_link_ids}
     links[:] = [l for l in links if not (isinstance(l, list) and l and l[0] in old_link_ids)]
-    removed = [n for n in nodes if n.get("id") in src_ids and n.get("type") == "LoadImage"]
-    ref_pos = removed[0].get("pos", [-700, 5600]) if removed else [-700, 5600]
+    removed = [n for n in nodes if n.get("id") in src_ids and n.get("type") == g["loader"]]
+    base_pos = removed[0].get("pos", [-700, 5600]) if removed else [-1100, 5600]
     nodes[:] = [n for n in nodes if n not in removed]
 
-    # スロットを count + 1 個に作り替える（末尾の1つは空き）
+    # スロットを count + 1 個に作り替える
     want = count + 1
     inputs[start:start + old_n] = [
-        {"label": f"ref_image_{i}", "name": f"{REF_SLOT_PREFIX}{i}",
-         "shape": 7, "type": "IMAGE", "link": None}
+        {"label": f"{g['label']}{i}", "name": f"{g['prefix']}{i}",
+         "shape": 7, "type": g["io_type"], "link": None}
         for i in range(want)
     ]
 
@@ -216,33 +246,38 @@ def set_reference_images(workflow: dict, count: int,
             if isinstance(l, list) and len(l) >= 5 and l[3] == tid and l[4] >= start + old_n:
                 l[4] += delta
 
-    # 新しい LoadImage を作ってつなぐ
+    # 新しい読み込みノードを作ってつなぐ
     next_node_id = max([n.get("id", 0) for n in nodes], default=0) + 1
     next_link_id = max([l[0] for l in links if isinstance(l, list) and l], default=0) + 1
     for i in range(count):
         nid, lid = next_node_id + i, next_link_id + i
         fname = filenames[i] if i < len(filenames) else ""
         nodes.append({
-            "id": nid, "type": "LoadImage",
-            "pos": [ref_pos[0], ref_pos[1] + i * 360],
-            "size": [290, 330], "flags": {}, "order": 0, "mode": 0,
+            "id": nid, "type": g["loader"],
+            "pos": [base_pos[0], base_pos[1] + i * g["gap"]],
+            "size": list(g["size"]), "flags": {}, "order": 0, "mode": 0,
             "inputs": [],
-            "outputs": [{"name": "IMAGE", "type": "IMAGE", "links": [lid]},
-                        {"name": "MASK", "type": "MASK", "links": None}],
+            "outputs": g["outputs"](lid),
             "properties": {"cnr_id": "comfy-core", "ver": "0.33.0",
-                           "Node name for S&R": "LoadImage"},
-            "widgets_values": [fname, "image"],
-            "widgets_values_named": {"image": fname, "upload": "image"},
+                           "Node name for S&R": g["loader"]},
+            "widgets_values": g["widgets"](fname),
+            "widgets_values_named": g["named"](fname),
         })
-        links.append([lid, nid, 0, tid, start + i, "IMAGE"])
+        links.append([lid, nid, 0, tid, start + i, g["io_type"]])
         inputs[start + i]["link"] = lid
 
     label = "、".join(filenames[:count]) if filenames else "未選択（UI で選ぶ）"
-    changes.append(f"  リファレンス画像: {old_connected}枚 -> {count}枚  ({label})")
-    if count == 0:
-        warnings.append("  ※ 0枚はリファレンスなしの生成になります。"
+    changes.append(f"  {g['jp']}: {old_connected}本 -> {count}本  ({label})")
+    if kind == "image" and count == 0:
+        warnings.append("  ※ 画像0枚はリファレンスなしの生成になります。"
                         "r2v モデルでの動作は未検証です（text-to-video なら t2v テンプレートを推奨）")
     return changes, warnings
+
+
+def set_reference_images(workflow: dict, count: int,
+                         filenames: list[str]) -> tuple[list[str], list[str]]:
+    return set_reference_group(workflow, "image", count, filenames)
+
 
 def patch(workflow: dict, preset: dict, user: str, mode: str,
           object_info: dict | None, refs: int | None = None,
@@ -275,7 +310,13 @@ def patch(workflow: dict, preset: dict, user: str, mode: str,
 
     # リファレンス画像の枚数（指定されたときだけ触る）
     if refs is not None:
-        c, w = set_reference_images(workflow, refs, ref_images or [])
+        c, w = set_reference_group(workflow, "image", refs, ref_images or [])
+        changes += c
+        warnings += w
+
+    # リファレンス音声（指定されたときだけ触る）
+    if ref_audios is not None:
+        c, w = set_reference_group(workflow, "audio", len(ref_audios), ref_audios)
         changes += c
         warnings += w
 
@@ -336,6 +377,8 @@ def main() -> int:
                     help="リファレンス画像の枚数 (0 以上)。省略時はテンプレートのまま(2枚)")
     ap.add_argument("--ref-images", nargs="*", default=None, metavar="FILE",
                     help="リファレンス画像のファイル名（ComfyUI の input ディレクトリ内）")
+    ap.add_argument("--ref-audios", nargs="*", default=None, metavar="FILE",
+                    help="リファレンス音声のファイル名（.wav 等）。省略時はテンプレートのまま(なし)")
     ap.add_argument("--prompt", help="プロンプト（Input Text (Prompt) を差し替える）")
     args = ap.parse_args()
 
@@ -373,6 +416,7 @@ def main() -> int:
         wf = copy.deepcopy(base)
         changes, warnings = patch(wf, preset, args.user, mode, object_info,
                                   refs=args.refs, ref_images=args.ref_images,
+                                  ref_audios=args.ref_audios,
                                   prompt_text=args.prompt)
         dest = os.path.join(OUT_DIR, f"h3_{mode}.json")
         with open(dest, "w", encoding="utf-8") as f:
