@@ -351,6 +351,10 @@ Pod 設定を **テンプレート `h3-comfyui`** として保存済みです（
 
 作り直し手順:
 
+0. Pods → ⋮ → **Terminate Pod**
+   **確認ダイアログの「Also delete attached network volume (h3-shared)」は
+   絶対にチェックしないこと。** 入れると 65GB のモデルと全生成物が消える。
+   既定はオフなので、そのまま Terminate Pod を押せばよい。
 1. **Deploy** → テンプレート `h3-comfyui` を選ぶ
 2. Network volume に **`h3-shared`** を選ぶ（リージョンが AP-JP-1 に自動ロック）
 3. GPU は **H100 SXM**（$3.29/hr）か **H200 SXM**（$4.59/hr）の空いている方
