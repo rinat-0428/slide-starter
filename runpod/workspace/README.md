@@ -10,22 +10,47 @@ Start  →  ComfyUI  →  生成  →  保存  →  Stop
 
 ## ⚠️ いちばん大事なルール
 
-```
-DO NOT TERMINATE THE POD.
-Always use STOP after finishing your work.
-```
-
-- **Terminate は絶対に押さない** — モデル・ワークフロー・生成物が消える可能性があります
-- **Stop は必ず押す** — 押し忘れると GPU 課金が流れ続けます
+- **終わったら必ず Stop** — 押し忘れると GPU 課金が流れ続けます（1時間$3〜5）
 - Stop 中は GPU 課金が止まり、ストレージ代のみになります
+
+### Terminate について
+
+**データは Network Volume（`h3-shared`）にあるので、Terminate しても消えません。**
+モデル65GBもワークフローも生成物も残ります。
+
+ただし、**他の人が使っている最中かもしれない**ので、
+Terminate する前に一声かけてください。
+
+> 以前は「Terminate 絶対禁止」でしたが、
+> データがボリューム側にある構成に変えたのでルールを更新しました。
+
+### Start できないときは作り直す
+
+「**Your Pod's GPUs are no longer available**」が出ることがあります。
+AP-JP-1 は GPU の台数が少なく、Stop 中に他の人に取られると起きます。
+
+このとき出る選択肢のうち、**「Automatically migrate your Pod data」は選ばないでください。**
+ボリュームが外れて、モデルも生成物も見えなくなります。
+
+**「Do nothing」を選んで閉じ、作り直してください。**
+
+1. Pods → ⋮ → **Terminate Pod**
+2. **Deploy** → テンプレート **`h3-comfyui`** を選ぶ
+3. Network volume に **`h3-shared`** を選ぶ（リージョンは自動で AP-JP-1 になります）
+4. GPU は **H100 SXM** か **H200 SXM** の空いている方
+5. Deploy
+
+**セットアップのやり直しは不要**です。1〜2分で ComfyUI が自動起動し、
+すぐ生成できます。Stop→Start より作り直しの方が成功しやすいので、
+遠慮なく作り直してください。
 
 ---
 
 ## 1. 起動する
 
 1. RunPod にログイン
-2. Team の Pod を開く
-3. **Start** を押す
+2. Pods を開く
+3. Pod があれば **Start**。無ければ **Deploy**（下の「作り直す」参照）
 4. 1〜2分待つ（ComfyUI が自動起動します）
 5. Pod の **Connect → HTTP Service [Port 8188]** を開く
 6. ComfyUI の画面が出れば OK
@@ -155,6 +180,10 @@ python3 /workspace/queue-workflow.py --workflow /workspace/workflows/h3_preview.
 2. **必要な動画をダウンロードして保存する**
 3. RunPod の画面に戻る
 4. **Stop** を押す
+
+> 次に使う人のことを考えると、Terminate してしまう方が親切な場合もあります。
+> Stop 中の Pod は特定のマシンを押さえたままになるためです。
+> 迷ったら Stop で構いません。
 
 Stop しても以下は残ります:
 
