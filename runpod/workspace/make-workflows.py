@@ -282,6 +282,7 @@ def set_reference_images(workflow: dict, count: int,
 def patch(workflow: dict, preset: dict, user: str, mode: str,
           object_info: dict | None, refs: int | None = None,
           ref_images: list[str] | None = None,
+          ref_audios: list[str] | None = None,
           prompt_text: str | None = None) -> tuple[list[str], list[str]]:
     changes: list[str] = []
     warnings: list[str] = []
