@@ -150,6 +150,20 @@ Deploy する前に、いま使える GPU を確認できます。
 
 > 初回だけ「**テンプレート**」のポップアップが出ます。右上の **×** で閉じてください。
 
+### 用意されているワークフロー
+
+左サイドバーの **ワークフロー**（`w`）に4本あります。**用途で選んでください。**
+
+| 名前 | 内容 |
+|------|------|
+| `h3_preview` | 標準・速い確認用（画像2枚） |
+| `h3_quality` | 標準・本番用（画像2枚） |
+| **`h3_preview_6ref_audio`** | **画像6枚 + 音声1つ**・速い確認用 |
+| **`h3_quality_6ref_audio`** | **画像6枚 + 音声1つ**・本番用 |
+
+`6ref_audio` 版は、**ノードの追加や配線はすべて済んでいます。**
+開いたら画像7か所（画像6 + 音声1）のファイルを差し替えて、プロンプトを書くだけです。
+
 ### Preview（速い・ラフ確認用）
 
 1. 左端のアイコン列から **ワークフロー**（`w`）を開き、`h3_preview` をクリック
@@ -362,7 +376,8 @@ python3 /workspace/make-workflows.py --user yasu --refs 4 \
 `MiniMax H3 Reference To Video` ノードの入力側を見ると、
 使っていない **`ref_image_2`** という空きスロットがあります（常に1つ空いています）。
 
-1. キャンバスの何もない所を**ダブルクリック** → 検索窓に `Load Image` と入力して追加
+1. キャンバスの何もない所を**ダブルクリック** → 検索窓に **`画像`** と入力し、
+   **「画像を読み込む」** を選ぶ
 2. 追加した「画像を読み込む」の **IMAGE 出力**から、
    `ref_image_2` の**入力の丸**へドラッグしてつなぐ
 3. つなぐと、その下に新しい空きスロット `ref_image_3` が自動で増えます
@@ -393,11 +408,15 @@ python3 /workspace/make-workflows.py --user yasu \
 python3 /workspace/make-workflows.py --user yasu --ref-audios voice.wav
 ```
 
-**UI で足す**
+**UI で足す**（実機で確認済みのノード名）
 
-1. キャンバスをダブルクリック → `Load Audio` を追加
-2. `MiniMax H3 Reference To Video` ノードの **`ref_audio_0`** の入力の丸へ、
-   `Load Audio` の **AUDIO 出力**からドラッグしてつなぐ
+1. キャンバスの空白を**ダブルクリック** → 検索窓に **`音声`** と入力
+2. 一番上に出る **「音声を読み込む」**（カテゴリ: オーディオ）を選ぶ
+3. `MiniMax H3 Reference To Video` ノードの **`ref_audio_0`** の入力の丸へ、
+   追加したノードの **AUDIO 出力**からドラッグしてつなぐ
+
+> 画像側のノード名は **「画像を読み込む」** です。
+> 検索窓は日本語で引けます（`Load Audio` など英語名では出ません）。
 
 音声ファイルも画像と同じ **`/workspace/input/`** に置きます
 （UI の `アップロードするファイルを選択` からでも入ります）。
@@ -467,9 +486,16 @@ python3 /workspace/make-workflows.py --user yasu --refs 1 --ref-images achan.png
 
 ### 0枚にしたい場合
 
-`--refs 0` で作れますが、**このワークフロー（r2v）での動作は未検証**です。
-テキストだけから作りたい場合は、ComfyUI の **テンプレート** 一覧にある
-**t2v（text-to-video）** を使う方が確実です。
+`--refs 0` でリファレンスなしにできます。**実機で動作確認済み**です
+（H100 / 145秒で生成完了）。プロンプトだけで生成したいときに使えます。
+
+```bash
+python3 /workspace/make-workflows.py --user yasu --refs 0 \
+  --prompt "a red sphere slowly rotating on a dark background"
+```
+
+UI でやる場合は「画像を読み込む」ノードを2つとも削除してください。
+プロンプトから `<Picture 1>` `<Picture 2>` の記述も消します。
 
 ---
 
