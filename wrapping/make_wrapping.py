@@ -312,8 +312,16 @@ def layout(w, h, seed, wrap, logo_w_mm=56, logo_gap_mm=118, motif_gap_mm=29, cha
     chars = []
     if char_gap_mm and CHAR_NAMES:
         cp = poisson(w, h, char_gap_mm * MM, rnd, wrap, existing=[(x, y, r * 1.9) for x, y, r in obstacles])
+        rnd.shuffle(cp)
+        placed = []
+        def near_same(nm, x, y):
+            ds = [min(abs(x - px), w - abs(x - px)) ** 2 + min(abs(y - py), h - abs(y - py)) ** 2
+                  for pn, px, py in placed if pn == nm]
+            return min(ds) if ds else float("inf")
         for i, (x, y) in enumerate(cp):
-            name = CHAR_NAMES[i % len(CHAR_NAMES)]
+            # pick the character whose nearest twin is farthest away -> even mix
+            name = max(CHAR_NAMES, key=lambda nm: (near_same(nm, x, y), rnd.random()))
+            placed.append((name, x, y))
             chars.append((name, x, y, rnd.random() < 0.5))
             hh = CHAR_H_MM[name] * MM
             if name == "char1":
