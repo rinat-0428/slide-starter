@@ -14,8 +14,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "out")
-FONT = os.path.join(HERE, "fonts", "montserrat-latin-800-normal.woff")
-FONT_SUB = os.path.join(HERE, "fonts", "montserrat-latin-700-normal.woff")
+FONT = os.path.join(HERE, "..", "shared", "fonts", "montserrat-latin-800-normal.woff")
+FONT_SUB = os.path.join(HERE, "..", "shared", "fonts", "montserrat-latin-700-normal.woff")
 
 DPI = 300
 MM = DPI / 25.4                       # px per mm
@@ -171,7 +171,7 @@ def sprite(name, size_px, angle_deg, color=LINE, line_ratio=0.052):
     if key in _cache:
         return _cache[key]
     if name in IMG_MOTIFS:
-        im = Image.open(os.path.join(HERE, "chars", IMG_MOTIFS[name])).convert("RGBA")
+        im = Image.open(os.path.join(CHAR_DIR, IMG_MOTIFS[name])).convert("RGBA")
         im = im.resize((max(1, int(im.width * size_px / im.height)), size_px), Image.LANCZOS)
         _cache[key] = im.rotate(angle_deg, resample=Image.BICUBIC, expand=True)
         return _cache[key]
@@ -215,9 +215,9 @@ def wordmark(width_px, color, font=FONT, text="CHAMMI", tracking=0.02):
     return out
 
 # ---------------------------------------------------------------- characters
-CHAR_DIR = os.path.join(HERE, "chars")
-CHAR_NAMES = ["char1", "char2"]
-CHAR_H_MM = {"char1": 58, "char2": 36}   # height on the wrapping paper            # chars/{name}_front.png (color) + _front_pink.png
+CHAR_DIR = os.path.join(HERE, "..", "shared", "characters")
+CHAR_NAMES = ["girl", "bunny"]
+CHAR_H_MM = {"girl": 58, "bunny": 36}   # height on the wrapping paper        
 _char_cache = {}
 def char_sprite(name, height_px, pink=True, flip=False):
     key = (name, height_px, pink, flip)
@@ -324,7 +324,7 @@ def layout(w, h, seed, wrap, logo_w_mm=56, logo_gap_mm=118, motif_gap_mm=29, cha
             placed.append((name, x, y))
             chars.append((name, x, y, rnd.random() < 0.5))
             hh = CHAR_H_MM[name] * MM
-            if name == "char1":
+            if name == "girl":
                 for dy in (-0.42, -0.14, 0.14, 0.42):
                     obstacles.append((x, y + dy * hh, hh * 0.21))
             else:
