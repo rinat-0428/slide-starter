@@ -208,6 +208,20 @@ def wordmark(width_px, color, font=FONT, text="CHAMMI", tracking=0.02):
     out.putalpha(img)
     return out
 
+# ---------------------------------------------------------------- characters
+CHAR_DIR = os.path.join(HERE, "chars")
+CHAR_NAMES = ["char1"]            # chars/{name}_front.png (color) + _front_pink.png
+_char_cache = {}
+def char_sprite(name, height_px, pink=True, flip=False):
+    key = (name, height_px, pink, flip)
+    if key not in _char_cache:
+        im = Image.open(os.path.join(CHAR_DIR, f"{name}_front{'_pink' if pink else ''}.png")).convert("RGBA")
+        im = im.resize((int(im.width * height_px / im.height), height_px), Image.LANCZOS)
+        if flip:
+            im = im.transpose(Image.FLIP_LEFT_RIGHT)
+        _char_cache[key] = im
+    return _char_cache[key]
+
 # ---------------------------------------------------------------- layout
 def poisson(w, h, rmin, rnd, wrap, existing=(), k=30, max_pts=100000):
     """Bridson Poisson-disk sampling. existing: list of (x, y, r) obstacles."""
@@ -277,7 +291,7 @@ class Bag:
                 return self.items.pop(i)
         return self.items.pop()
 
-def layout(w, h, seed, wrap, logo_w_mm=56, logo_gap_mm=118, motif_gap_mm=29):
+def layout(w, h, seed, wrap, logo_w_mm=56, logo_gap_mm=118, motif_gap_mm=29, char_gap_mm=150, char_h_mm=58):
     rnd = random.Random(seed)
     lw = logo_w_mm * MM
     # logos: Poisson with anisotropic distance (squash x so rows don't line up)
@@ -287,6 +301,15 @@ def layout(w, h, seed, wrap, logo_w_mm=56, logo_gap_mm=118, motif_gap_mm=29):
     for x, y in logos:  # approximate logo rectangle with 3 circles
         for dx in (-0.36, -0.12, 0.12, 0.36):
             obstacles.append((x + dx * lw, y, lw * 0.30))
+    # characters: sparse, between logos
+    chars = []
+    if char_gap_mm and CHAR_NAMES:
+        cp = poisson(w, h, char_gap_mm * MM, rnd, wrap, existing=[(x, y, r * 1.9) for x, y, r in obstacles])
+        for i, (x, y) in enumerate(cp):
+            chars.append((CHAR_NAMES[i % len(CHAR_NAMES)], x, y, rnd.random() < 0.5))
+            hh = char_h_mm * MM
+            for dy in (-0.42, -0.14, 0.14, 0.42):
+                obstacles.append((x, y + dy * hh, hh * 0.21))
     pts = poisson(w, h, motif_gap_mm * MM, rnd, wrap, existing=obstacles)
     bag = Bag(rnd); motifs = []
     for x, y in pts:
@@ -295,11 +318,11 @@ def layout(w, h, seed, wrap, logo_w_mm=56, logo_gap_mm=118, motif_gap_mm=29):
         size = int(rnd.uniform(lo, hi) * MM)
         ang = rnd.uniform(-22, 22)
         motifs.append((name, x, y, size, ang))
-    return logos, motifs
+    return logos, motifs, chars
 
 def render(w, h, logo_color, seed, wrap=False, logo=True, scale=1.0, **kw):
     """scale<1 renders a low-res preview of the same layout."""
-    logos, motifs = layout(w, h, seed, wrap, **kw)
+    logos, motifs, chars = layout(w, h, seed, wrap, **kw)
     W, H = int(w * scale), int(h * scale)
     img = Image.new("RGBA", (W, H), BG + (255,))
     def paste(spr, cx, cy):
@@ -314,6 +337,8 @@ def render(w, h, logo_color, seed, wrap=False, logo=True, scale=1.0, **kw):
                 else img.paste(spr, (x0, y0), spr)
     for name, x, y, size, ang in motifs:
         paste(sprite(name, max(8, int(size * scale)), round(ang)), x, y)
+    for name, x, y, flip in chars:
+        paste(char_sprite(name, int(kw.get("char_h_mm", 58) * MM * scale), True, flip), x, y)
     if logo:
         lm = wordmark(int(kw.get("logo_w_mm", 56) * MM * scale), logo_color)
         for x, y in logos:
@@ -341,11 +366,16 @@ def card(variant):
     bleed = 3
     W, H = (100 + 2*bleed) * MM, (148 + 2*bleed) * MM
     # front: pattern without repeated logos + one centered logo on a clear zone
-    logo_w = 62 * MM
-    cx, cy = W / 2, H / 2
+    logo_w = 56 * MM
+    cx, cy = W / 2, (bleed + 26) * MM
+    ch_h = int(96 * MM)
+    ch = char_sprite(CHAR_NAMES[0], ch_h, pink=False)
+    ch_x, ch_y = int(W / 2 - ch.width / 2), int(H - (bleed + 9) * MM - ch_h)
     rnd = random.Random(7 if variant == "a" else 8)
     obstacles = [(cx + dx * logo_w, cy, logo_w * 0.30) for dx in (-0.36, -0.12, 0.12, 0.36)]
-    obstacles.append((cx, cy + 14 * MM, 14 * MM))
+    obstacles.append((cx, cy + 12 * MM, 12 * MM))
+    for f in (0.15, 0.4, 0.65, 0.9):
+        obstacles.append((W / 2, ch_y + f * ch_h, ch.width * 0.85))
     pts = poisson(W, H, 22 * MM, rnd, False, existing=obstacles)
     front = Image.new("RGBA", (int(W), int(H)), BG + (255,))
     bag = Bag(rnd)
@@ -354,11 +384,17 @@ def card(variant):
         lo, hi = SIZE_MM.get(name, DEFAULT_SIZE_MM)
         spr = sprite(name, int(rnd.uniform(lo, hi) * MM * 0.85), round(rnd.uniform(-22, 22)))
         front.paste(spr, (int(x - spr.width/2), int(y - spr.height/2)), spr)
+    # soft shadow under the character
+    sh = Image.new("L", front.size, 0)
+    ImageDraw.Draw(sh).ellipse([W/2 - ch.width*0.55, ch_y + ch_h - 4*MM, W/2 + ch.width*0.55, ch_y + ch_h + 2*MM], fill=60)
+    sh = sh.filter(ImageFilter.GaussianBlur(10))
+    front = Image.composite(Image.new("RGBA", front.size, (216, 150, 165, 255)), front, sh)
+    front.alpha_composite(ch, (ch_x, ch_y))
     lm = wordmark(int(logo_w), color)
     front.alpha_composite(lm, (int(cx - lm.width/2), int(cy - lm.height/2)))
     sub = wordmark(int(30 * MM), color if variant == "b" else (120, 110, 112), font=FONT_SUB,
                    text="THANK YOU 2026", tracking=0.18)
-    front.alpha_composite(sub, (int(cx - sub.width/2), int(cy + lm.height/2 + 6 * MM)))
+    front.alpha_composite(sub, (int(cx - sub.width/2), int(cy + lm.height/2 + 4 * MM)))
     # back: white, ruled lines, tiny motifs
     back = Image.new("RGBA", (int(W), int(H)), (255, 255, 255, 255))
     d = ImageDraw.Draw(back)
