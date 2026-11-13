@@ -153,6 +153,7 @@ def m_lipstick():
     case = rrect(-0.32, 0.15, 0.32, 0.92, 0.06)
     return [tip, sleeve, case]
 
+IMG_MOTIFS = {"wand": "wand_front_pink.png"}   # raster motifs cut from the character sheets
 MOTIFS = {
     "heart": m_heart, "sparkle": m_sparkle, "star": m_star, "crown": m_crown,
     "flower": m_flower, "bubble": m_bubble, "bow": m_bow, "clapper": m_clapper,
@@ -160,14 +161,19 @@ MOTIFS = {
 }
 # relative frequency (sparkles are the "filler" like the cover)
 WEIGHTS = {"sparkle": 3, "heart": 2, "star": 1.4, "crown": 1, "flower": 1, "bubble": 1,
-           "bow": 1, "clapper": 1, "film": 1, "penlight": 1, "lipstick": 0.6}
-SIZE_MM = {"sparkle": (9, 14), "heart": (11, 15), "star": (12, 16)}   # others: default
+           "bow": 1, "clapper": 1, "film": 1, "penlight": 1, "lipstick": 0.6, "wand": 0.8}
+SIZE_MM = {"sparkle": (9, 14), "heart": (11, 15), "star": (12, 16), "wand": (20, 24)}   # others: default
 DEFAULT_SIZE_MM = (15, 20)
 
 _cache = {}
 def sprite(name, size_px, angle_deg, color=LINE, line_ratio=0.052):
     key = (name, size_px, round(angle_deg, 1), color)
     if key in _cache:
+        return _cache[key]
+    if name in IMG_MOTIFS:
+        im = Image.open(os.path.join(HERE, "chars", IMG_MOTIFS[name])).convert("RGBA")
+        im = im.resize((max(1, int(im.width * size_px / im.height)), size_px), Image.LANCZOS)
+        _cache[key] = im.rotate(angle_deg, resample=Image.BICUBIC, expand=True)
         return _cache[key]
     S = size_px * SS
     pad = int(S * 0.15)
@@ -210,7 +216,8 @@ def wordmark(width_px, color, font=FONT, text="CHAMMI", tracking=0.02):
 
 # ---------------------------------------------------------------- characters
 CHAR_DIR = os.path.join(HERE, "chars")
-CHAR_NAMES = ["char1"]            # chars/{name}_front.png (color) + _front_pink.png
+CHAR_NAMES = ["char1", "char2"]
+CHAR_H_MM = {"char1": 58, "char2": 36}   # height on the wrapping paper            # chars/{name}_front.png (color) + _front_pink.png
 _char_cache = {}
 def char_sprite(name, height_px, pink=True, flip=False):
     key = (name, height_px, pink, flip)
@@ -291,7 +298,7 @@ class Bag:
                 return self.items.pop(i)
         return self.items.pop()
 
-def layout(w, h, seed, wrap, logo_w_mm=56, logo_gap_mm=118, motif_gap_mm=29, char_gap_mm=150, char_h_mm=58):
+def layout(w, h, seed, wrap, logo_w_mm=56, logo_gap_mm=118, motif_gap_mm=29, char_gap_mm=125):
     rnd = random.Random(seed)
     lw = logo_w_mm * MM
     # logos: Poisson with anisotropic distance (squash x so rows don't line up)
@@ -306,10 +313,14 @@ def layout(w, h, seed, wrap, logo_w_mm=56, logo_gap_mm=118, motif_gap_mm=29, cha
     if char_gap_mm and CHAR_NAMES:
         cp = poisson(w, h, char_gap_mm * MM, rnd, wrap, existing=[(x, y, r * 1.9) for x, y, r in obstacles])
         for i, (x, y) in enumerate(cp):
-            chars.append((CHAR_NAMES[i % len(CHAR_NAMES)], x, y, rnd.random() < 0.5))
-            hh = char_h_mm * MM
-            for dy in (-0.42, -0.14, 0.14, 0.42):
-                obstacles.append((x, y + dy * hh, hh * 0.21))
+            name = CHAR_NAMES[i % len(CHAR_NAMES)]
+            chars.append((name, x, y, rnd.random() < 0.5))
+            hh = CHAR_H_MM[name] * MM
+            if name == "char1":
+                for dy in (-0.42, -0.14, 0.14, 0.42):
+                    obstacles.append((x, y + dy * hh, hh * 0.21))
+            else:
+                obstacles.append((x, y, hh * 0.62))
     pts = poisson(w, h, motif_gap_mm * MM, rnd, wrap, existing=obstacles)
     bag = Bag(rnd); motifs = []
     for x, y in pts:
@@ -338,7 +349,7 @@ def render(w, h, logo_color, seed, wrap=False, logo=True, scale=1.0, **kw):
     for name, x, y, size, ang in motifs:
         paste(sprite(name, max(8, int(size * scale)), round(ang)), x, y)
     for name, x, y, flip in chars:
-        paste(char_sprite(name, int(kw.get("char_h_mm", 58) * MM * scale), True, flip), x, y)
+        paste(char_sprite(name, int(CHAR_H_MM[name] * MM * scale), True, flip), x, y)
     if logo:
         lm = wordmark(int(kw.get("logo_w_mm", 56) * MM * scale), logo_color)
         for x, y in logos:
@@ -370,12 +381,16 @@ def card(variant):
     cx, cy = W / 2, (bleed + 26) * MM
     ch_h = int(96 * MM)
     ch = char_sprite(CHAR_NAMES[0], ch_h, pink=False)
-    ch_x, ch_y = int(W / 2 - ch.width / 2), int(H - (bleed + 9) * MM - ch_h)
+    ch_x, ch_y = int(W / 2 - ch.width / 2 - 9 * MM), int(H - (bleed + 9) * MM - ch_h)
+    bn_h = int(40 * MM)
+    bn = char_sprite(CHAR_NAMES[1], bn_h, pink=False)
+    bn_x, bn_y = int(ch_x + ch.width - 4 * MM), int(H - (bleed + 8) * MM - bn_h)
     rnd = random.Random(7 if variant == "a" else 8)
     obstacles = [(cx + dx * logo_w, cy, logo_w * 0.30) for dx in (-0.36, -0.12, 0.12, 0.36)]
     obstacles.append((cx, cy + 12 * MM, 12 * MM))
     for f in (0.15, 0.4, 0.65, 0.9):
-        obstacles.append((W / 2, ch_y + f * ch_h, ch.width * 0.85))
+        obstacles.append((ch_x + ch.width / 2, ch_y + f * ch_h, ch.width * 0.85))
+    obstacles.append((bn_x + bn.width / 2, bn_y + bn_h / 2, bn_h * 0.75))
     pts = poisson(W, H, 22 * MM, rnd, False, existing=obstacles)
     front = Image.new("RGBA", (int(W), int(H)), BG + (255,))
     bag = Bag(rnd)
@@ -386,10 +401,13 @@ def card(variant):
         front.paste(spr, (int(x - spr.width/2), int(y - spr.height/2)), spr)
     # soft shadow under the character
     sh = Image.new("L", front.size, 0)
-    ImageDraw.Draw(sh).ellipse([W/2 - ch.width*0.55, ch_y + ch_h - 4*MM, W/2 + ch.width*0.55, ch_y + ch_h + 2*MM], fill=60)
+    sd = ImageDraw.Draw(sh)
+    sd.ellipse([ch_x - ch.width*0.05, ch_y + ch_h - 4*MM, ch_x + ch.width*1.05, ch_y + ch_h + 2*MM], fill=60)
+    sd.ellipse([bn_x + bn.width*0.1, bn_y + bn_h - 4*MM, bn_x + bn.width*0.9, bn_y + bn_h + 2*MM], fill=60)
     sh = sh.filter(ImageFilter.GaussianBlur(10))
     front = Image.composite(Image.new("RGBA", front.size, (216, 150, 165, 255)), front, sh)
     front.alpha_composite(ch, (ch_x, ch_y))
+    front.alpha_composite(bn, (bn_x, bn_y))
     lm = wordmark(int(logo_w), color)
     front.alpha_composite(lm, (int(cx - lm.width/2), int(cy - lm.height/2)))
     sub = wordmark(int(30 * MM), color if variant == "b" else (120, 110, 112), font=FONT_SUB,

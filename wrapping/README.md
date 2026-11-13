@@ -20,8 +20,11 @@
 ## キャラクター
 - `chars/char1_front.png`：キャラ設定画の正面図を切り抜いたもの（カラー）
 - `chars/char1_front_pink.png`：包装紙用のピンク・モノトーン版
-- 包装紙にはピンク版を高さ58mmで散らし、カード表面にはカラー版を高さ96mmで配置
-- 2体目を追加するときは `chars/{name}_front.png` と `_front_pink.png` を置いて `CHAR_NAMES` に名前を足す
+- `chars/char2_front.png` / `_pink.png`：うさぎ（2枚目の設定画から切り抜き）
+- `chars/wand_front_pink.png`：ステッキ。柄のモチーフのひとつとして散らしている
+- 包装紙：ピンク版を女の子は高さ58mm、うさぎは36mmで交互に散らす
+- カード表面：カラー版で女の子（96mm）とうさぎ（40mm）を並べる
+- キャラをさらに追加するときは `chars/{name}_front.png` と `_front_pink.png` を置いて `CHAR_NAMES` に名前を足す
 
 ## 入稿時の注意
 - データはRGBです。印刷会社側でCMYKに変換されると、淡いピンクが少しくすむ可能性があります
